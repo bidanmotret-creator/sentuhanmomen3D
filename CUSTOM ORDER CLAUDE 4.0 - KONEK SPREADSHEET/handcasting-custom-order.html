@@ -132,10 +132,21 @@
             display: grid;
             grid-template-columns: 1fr 1.4fr;
             gap: 35px;
+            min-width: 0; /* ◄▬▬ Mencegah halaman utama ikut melar */
         }
 
         /* ══ GALLERY / LEFT PANEL ══ */
-        .gallery-section { position: sticky; top: 130px; height: fit-content; }
+        .left-panel {
+            min-width: 0; /* ◄▬▬ Mencegah panel kiri menjebol batas layar */
+        }
+
+        .gallery-section { 
+            position: sticky; 
+            top: 130px; 
+            height: fit-content; 
+            width: 100%;
+            min-width: 0; /* ◄▬▬ Kunci sakti pembatas galeri */
+        }
 
         .main-image {
             width: 100%;
@@ -164,20 +175,46 @@
             backdrop-filter: blur(4px);
         }
 
-        .thumbnail-list { display: flex; gap: 10px; margin-bottom: 20px; }
+        /* ══ FIX GALERI BANYAK FOTO (HORIZONTAL OVERFLOW) ══ */
+        /* ══ FIX GALERI BANYAK FOTO (HORIZONTAL OVERFLOW) ══ */
+        #thumbnailContainer {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 10px;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto !important;
+            padding-bottom: 12px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        #thumbnailContainer::-webkit-scrollbar {
+            display: none;
+        }
+        
         .thumb {
-            width: 72px; height: 72px;
+            flex: 0 0 70px !important; /* Paksa lebar 70px dan jangan menyusut */
+            height: 70px !important;   /* Paksa tinggi 70px */
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2.5px solid transparent;
             background: var(--teal-light);
-            border-radius: 10px;
-            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
         }
-        .thumb:hover, .thumb.active { border-color: var(--teal); transform: scale(1.05); }
+        .thumb:hover, .thumb.active { 
+            border-color: var(--teal); 
+        }
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .prod-title { font-family: 'Fredoka', sans-serif; font-size: 1.9rem; font-weight: 600; line-height: 1.2; }
         .prod-desc { font-size: 0.9rem; color: var(--text-muted); margin: 8px 0 14px; line-height: 1.6; }
@@ -489,6 +526,8 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
+
+        /* ══ RESPONSIVE ══ */
         @media (max-width: 900px) {
             .floating-total { display: flex; }
             .order-container { grid-template-columns: 1fr; margin-bottom: 80px; }
@@ -575,35 +614,6 @@
             background-image: url('https://ik.imagekit.io/sentuhanmomen/logo.png?updatedAt=1780577184412');
             background-size: contain; background-repeat: no-repeat;
             background-position: right bottom; opacity: 0.5; pointer-events: none;
-        }
-
-        /* ══ FIX GALERI AGAR BISA DI-SWIPE DI HP ══ */
-        #thumbnailContainer {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 8px; /* Ruang untuk scrollbar */
-            scroll-behavior: smooth;
-            width: 100%;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        #thumbnailContainer::-webkit-scrollbar {
-            display: none; /* Menyembunyikan scrollbar bawaan Chrome/Safari */
-        }
-        .thumb {
-            flex: 0 0 calc(20% - 8px); /* Menampilkan 5 gambar agar pas */
-            min-width: 65px; /* Lebar minimal agar tidak terlalu kecil */
-            max-width: 80px; 
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .thumb.active {
-            border-color: var(--teal);
         }
     </style>
 </head>
@@ -720,12 +730,33 @@
                 </div>
             </div>
 
-            <div class="step-section" id="colorPickerSection" style="margin-bottom: 30px;">
-                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎨 Pilih Warna & Material</h3>
-                <p style="color:var(--text-muted); font-size:0.85rem;">Pilih preferensi tekstur atau warna untuk setiap bagian.</p>
+            <div class="step-section" id="photoTierSection" style="display: none; margin-bottom: 30px;">
+                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">📸 Pilih Paket Fotografi</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem;">Pilih paket layanan yang sesuai dengan kebutuhan Anda.</p>
+                <div id="photoTierGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;"></div>
+            </div>
+
+            <div class="step-section" id="crossSellSection" style="display: none; background: var(--pink-light); padding: 16px; border-radius: 12px; border: 1.5px dashed var(--pink); margin-bottom: 25px;">
+                <h3 id="crossSellTitle" style="color: var(--pink); margin-top: 0; font-size: 1rem;">✨ Spesial Promo Bundling!</h3>
+                <p id="crossSellDesc" style="font-size: 0.82rem; color: var(--text-dark); margin-bottom: 12px;">Lengkapi momen ini. Tambahkan produk pendamping dengan harga subsidi khusus bundling.</p>
                 
-                <div id="colorPickerContainer" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 15px 0;">
+                <div style="display: flex; gap: 14px; align-items: center;">
+                    <img id="crossSellPreviewImg" src="" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow); display: none;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                        <select id="optCrossSell" onchange="updateCrossSellUi(); hitungTotal();" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--pink); font-weight: 600; color: var(--text-dark); background: white;"></select>
+                        <div id="crossSellSavingsBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.8rem; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255, 105, 180, 0.3); width: fit-content; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                            <span style="color: var(--text-muted); text-decoration: line-through;" id="csNormalPrice">Rp 0</span>
+                            <span style="color: #00C896; font-weight: 700;" id="csSavingsPrice">Hemat Rp 0</span>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="step-section" id="colorPickerSection" style="margin-bottom: 30px;">
+                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎨 Pilih Warna Background dan Bingkai</h3>
+                <p style="color:var(--text-muted); font-size:0.85rem;">Pilih warna favorit untuk setiap bagian. Anda akan dikirim preview design melalui WA</p>
+                
+                <div id="colorPickerContainer" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 15px 0;"></div>
                 
                 <div style="margin-top: 20px; padding: 15px; background: var(--teal-light); border-radius: 12px; border: 1px dashed var(--teal);">
                     <h4 style="margin-top: 0; font-size: 0.9rem; color: var(--teal);">Preview Material Dipilih:</h4>
@@ -758,39 +789,11 @@
                 </div>
             </div>
 
-            <div class="step-section" id="photoTierSection" style="display: none; margin-bottom: 30px;">
-                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">📸 Pilih Paket Fotografi</h3>
-                <p style="color:var(--text-muted); font-size:0.85rem;">Pilih paket layanan yang sesuai dengan kebutuhan Anda.</p>
-                
-                <div id="photoTierGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;">
-                    </div>
-            </div>
-
-            <div class="step-section" id="crossSellSection" style="display: none; background: var(--pink-light); padding: 16px; border-radius: 12px; border: 1.5px dashed var(--pink); margin-bottom: 25px;">
-    <h3 id="crossSellTitle" style="color: var(--pink); margin-top: 0; font-size: 1rem;">✨ Spesial Promo Bundling!</h3>
-    <p id="crossSellDesc" style="font-size: 0.82rem; color: var(--text-dark); margin-bottom: 12px;">Lengkapi momen ini. Tambahkan produk pendamping dengan harga subsidi khusus bundling.</p>
-    
-    <div style="display: flex; gap: 14px; align-items: center;">
-        <img id="crossSellPreviewImg" src="" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow); display: none;">
-        
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-            <select id="optCrossSell" onchange="updateCrossSellUi(); hitungTotal();" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--pink); font-weight: 600; color: var(--text-dark); background: white;">
-                </select>
-            
-            <div id="crossSellSavingsBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.8rem; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255, 105, 180, 0.3); width: fit-content; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                <span style="color: var(--text-muted); text-decoration: line-through;" id="csNormalPrice">Rp 0</span>
-                <span style="color: #00C896; font-weight: 700;" id="csSavingsPrice">Hemat Rp 0</span>
-            </div>
-        </div>
-    </div>
-</div>
-
             <div class="step-section" id="aksesoriSection" style="margin-bottom: 20px;">
                 <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎁 Tambahan Aksesoris</h3>
                 <p style="color:var(--text-muted); font-size:0.85rem;">Lengkapi mahakarya Anda dengan detail ekstra (Opsional).</p>
                 
-                <div id="aksesoriGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0;">
-                    </div>
+                <div id="aksesoriGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0;"></div>
 
                 <div style="margin-top: 15px; padding: 15px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -809,6 +812,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <div class="summary-box">
                 <div class="summary-row"><span class="label" id="lblBase">Paket Dasar</span><span id="sumBase">Rp 0</span></div>
@@ -1009,7 +1013,8 @@
     }
 
     // ════════════════════════════════════════
-    //  DYNAMIC KUSTOMISASI (TARGETED CROSS-SELL)
+    // ════════════════════════════════════════
+    // DYNAMIC KUSTOMISASI (TARGETED CROSS-SELL)
     // ════════════════════════════════════════
     function renderDynamicKustomisasi() {
         const isPhoto = selectedProduct?.isPhotoPackage || false;
@@ -1031,6 +1036,7 @@
         }
 
         if (isPhoto) {
+            // ▬▬ 1. JIKA PRODUK UTAMA = FOTO ▬▬
             if(colorSection) colorSection.style.display = 'none'; 
             if(photoTierSection) photoTierSection.style.display = 'block';
             
@@ -1103,16 +1109,17 @@
             }
 
         } else {
+            // ▬▬ 2. JIKA PRODUK UTAMA = HANDCASTING ▬▬
             if(colorSection) colorSection.style.display = 'block'; 
             if(photoTierSection) photoTierSection.style.display = 'none';
 
-            // Saring cross-sell khusus untuk paket handcasting ini
+            // Saring cross-sell (Foto) khusus untuk paket handcasting ini
             let filteredCS = getFilteredCrossSell(WEB_CONFIG.crossSellPhoto || []);
             
             if(crossSellSection) {
                 // Hanya munculkan area Cross-Sell jika ada data yang lolos filter
                 crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
-                if(document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '📸 Tambah Sesi Foto Studio / Homecare!';
+                if(document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '📸 Tambah Sesi Foto Studio / Homeservice!';
                 if(document.getElementById('crossSellDesc')) document.getElementById('crossSellDesc').innerHTML = 'Sempurnakan karya seni Handcasting ini dengan kenangan foto profesional. Dapatkan harga khusus bundling!';
             }
 

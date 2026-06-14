@@ -6,6 +6,30 @@
     <title>Handcasting 3D & 2D Premium - SentuhanMomen3D</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+
+        /* ══ EFEK SKELETON LOADING ══ */
+        @keyframes shimmer {
+            0% { background-position: -468px 0; }
+            100% { background-position: 468px 0; }
+        }
+        .skeleton-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            padding: 10px 0;
+        }
+        .skeleton-card {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 100%; 
+            animation: shimmer 1.5s infinite linear forwards;
+            border-radius: 12px;
+            height: 320px; /* Meniru tinggi kartu produk asli */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
         :root {
             --pink: #FF69B4;
             --pink-light: #FFE5F1;
@@ -721,6 +745,111 @@
             width: 24px;
             border-radius: 10px;
         }
+
+        /* ══ EFEK FLASH SALE ══ */
+        .flash-sale-container {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 15px rgba(255, 75, 43, 0.3);
+            text-align: center;
+        }
+        .fs-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .fs-timer {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .time-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            min-width: 60px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        .time-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            display: block;
+            margin-top: 4px;
+            font-weight: normal;
+        }
+        .fs-product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            width: 100%;
+            max-width: 400px;
+            color: #333;
+        }
+        .fs-price-strike {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .fs-price-new {
+            color: #ff4b2b;
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-left: 8px;
+        }
+        .fs-btn {
+            background: #ff4b2b;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* ══ TAMBAHAN EFEK GAMBAR FLASH SALE ══ */
+        .fs-product-card {
+            /* (Pastikan ini menimpa kode .fs-product-card sebelumnya) */
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            width: 100%;
+            max-width: 450px;
+            color: #333;
+            display: flex; /* Mengatur elemen agar bersebelahan */
+            gap: 15px;
+            align-items: center;
+            text-align: left;
+        }
+        .fs-img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .fs-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
     </style>
     <script>
         !function(f,b,e,v,n,t,s)
@@ -809,11 +938,38 @@
         <h2 id="sectionTitle">Semua Paket</h2>
         <span class="count-badge" id="countBadge">0 paket</span>
     </div>
-    <div class="no-results" id="noResults">
+    
+    <div class="no-results" id="noResults" style="display: none;">
         <div style="font-size:3rem;margin-bottom:12px;">🔍</div>
         <div style="font-size:1rem;font-weight:600;margin-bottom:6px;">Paket tidak ditemukan</div>
     </div>
-    <div class="products-grid" id="productsGrid"></div>
+    <div id="flashSaleWrapper" style="display: none;">
+        <div class="flash-sale-container">
+            <!-- Tambahan ID di bawah ini agar teks bisa diganti otomatis -->
+            <div class="fs-header" id="fsPromoName">
+                ⚡ FLASH SALE BERAKHIR DALAM ⚡
+            </div>
+            <div class="fs-timer" id="fsTimer">
+                <div class="time-box"><span id="fsHours">00</span><span class="time-label">Jam</span></div>
+                <div class="time-box"><span id="fsMins">00</span><span class="time-label">Menit</span></div>
+                <div class="time-box"><span id="fsSecs">00</span><span class="time-label">Detik</span></div>
+            </div>
+            
+            <div class="fs-product-card" id="fsProductInfo">
+                </div>
+        </div>
+    </div>
+    
+    <!-- ══ SKELETON LOADING (Muncul saat loading) ══ -->
+    <div id="skeletonLoading" class="skeleton-container">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+    </div>
+
+    <!-- ══ GRID PRODUK ASLI (Disembunyikan dulu) ══ -->
+    <div class="products-grid" id="productsGrid" style="display: none;"></div>
 </section>
 
 <!-- HOW IT WORKS -->
@@ -1016,7 +1172,7 @@
         window.WEB_CONFIG = { products: [], mitra: { 'pusat': { nama: 'Bidan Motret Pusat', lokasi: 'Bandar Lampung', wa: '6282177272512' } } };
     }
 
-    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec?action=getMenuHarga";
+    const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
     // ══ 1. SENSOR ANALITIK INTERNAL ══
     function kirimAnalitik(aksi, namaProduk, nominal) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1088,7 +1244,9 @@ window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nam
 
         // 2. DIAM-DIAM AMBIL DATA TERBARU DARI GOOGLE
         try {
-            const response = await fetch(GOOGLE_SHEETS_API_URL + "&timestamp=" + new Date().getTime());
+            // ▬▬ PERBAIKAN PENTING DI SINI: Tambahkan ?action=getMenuHarga ▬▬
+            const urlKatalog = GOOGLE_SHEETS_API_URL + "?action=getMenuHarga&timestamp=" + new Date().getTime();
+            const response = await fetch(urlKatalog);
             const liveConfig = await response.json();
 
             localStorage.setItem(CACHE_KEY, JSON.stringify(liveConfig));
@@ -1111,7 +1269,7 @@ window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nam
                 if (mLoc) mLoc.textContent = agen.lokasi;
             }
         } catch (err) {
-            console.error("Gagal sinkronisasi:", err);
+            console.error("Gagal sinkronisasi katalog:", err);
         }
     }
     const badgeClass = { 
@@ -1294,6 +1452,7 @@ function goToOrder(productId) {
 
     // ════════════════════════════════════════
     // ════════════════════════════════════════
+    // ════════════════════════════════════════
     // FUNGSI PEMBUAT KARTU & SUB-JUDUL
     // ════════════════════════════════════════
     function renderProducts(list, activeCategory = 'semua') {
@@ -1335,6 +1494,7 @@ function goToOrder(productId) {
 
         grid.innerHTML = finalHtml;
         if(count) count.textContent = validProducts.length + ' paket';
+        
         // ▬▬ LAPOR META PIXEL: KATALOG UTAMA DILIHAT ▬▬
         if (typeof fbq === 'function') {
             fbq('track', 'ViewContent', {
@@ -1342,8 +1502,164 @@ function goToOrder(productId) {
                 content_category: 'Etalase_Utama'
             });
         }
+
+        // ▬▬ MATIKAN SKELETON & MUNCULKAN PRODUK ASLI ▬▬
+        const skeleton = document.getElementById('skeletonLoading');
+        if(skeleton) skeleton.style.display = 'none'; // Sembunyikan bayangan abu-abu
+        grid.style.display = ''; // Hilangkan "display: none" agar kembali mengikuti CSS bawaan (grid)
+    }
+    // ════════════════════════════════════════
+   // ════════════════════════════════════════
+    // FUNGSI MESIN FLASH SALE (VERSI MULTI-CABANG)
+    // ════════════════════════════════════════
+    // ════════════════════════════════════════
+    // FUNGSI MESIN FLASH SALE (VERSI TIMING & KUOTA)
+    // ════════════════════════════════════════
+    let fsInterval;
+
+    function renderFlashSale(promoData) {
+        if (!promoData || promoData.status !== 'Aktif') return;
+
+        // 1. FILTER MITRA
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentMitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        const targetMitraString = (promoData.target_mitra || 'all').toLowerCase();
+        const listTargetMitra = targetMitraString.split(',').map(item => item.trim());
+        
+        if (!listTargetMitra.includes('all') && !listTargetMitra.includes(currentMitra)) {
+            return; 
+        }
+
+        const wrapper = document.getElementById('flashSaleWrapper');
+        const productInfo = document.getElementById('fsProductInfo');
+        const promoNameTitle = document.getElementById('fsPromoName');
+        
+        if (promoNameTitle) {
+            promoNameTitle.innerHTML = `⚡ ${promoData.nama_promo || 'FLASH SALE'} ⚡`;
+        }
+
+        // Ambil data visual gambar jika ada
+        let imgHtml = '';
+        if (promoData.url_gambar && promoData.url_gambar !== '') {
+            imgHtml = `<img src="${promoData.url_gambar}" class="fs-img" alt="Promo">`;
+        }
+
+        // Jalankan Interval Hitung Mundur Dinamis
+        const targetMulai = new Date(promoData.waktu_mulai).getTime();
+        const targetSelesai = new Date(promoData.batas_waktu).getTime();
+
+        wrapper.style.display = 'block';
+
+        clearInterval(fsInterval);
+        fsInterval = setInterval(() => {
+            const now = new Date().getTime();
+            let distance = 0;
+            let isRunning = false;
+
+            // Logika Fase Waktu Promo
+            if (now < targetMulai) {
+                // FASE 1: Belum Mulai (Teaser)
+                distance = targetMulai - now;
+                if (promoNameTitle) promoNameTitle.innerHTML = `⏳ PROMO DIMULAI DALAM ⏳`;
+            } else if (now >= targetMulai && now <= targetSelesai) {
+                // FASE 2: Sedang Berjalan
+                distance = targetSelesai - now;
+                isRunning = true;
+                if (promoNameTitle) promoNameTitle.innerHTML = `⚡ ${promoData.nama_promo || 'FLASH SALE'} ⚡`;
+            } else {
+                // FASE 3: Sudah Hangus
+                clearInterval(fsInterval);
+                wrapper.style.display = 'none';
+                return;
+            }
+
+            // Hitung Jam, Menit, Detik
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('fsHours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('fsMins').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('fsSecs').innerText = seconds.toString().padStart(2, '0');
+
+            // Cetak/Update Konten Kartu Berdasarkan Status
+            if (isRunning) {
+                // Jika Kuota Habis secara manual di sheet
+                if (promoData.kuota_sisa <= 0) {
+                    productInfo.innerHTML = `
+                        ${imgHtml}
+                        <div class="fs-details">
+                            <div style="font-weight: 800; font-size: 1.05rem; margin-bottom: 5px; color:#888;">${promoData.nama_paket}</div>
+                            <div style="color: #ff4b2b; font-weight: bold; margin-bottom: 5px;">❌ KUOTA PROMO HABIS</div>
+                            <button class="fs-btn" style="background:#ccc; cursor:not-allowed;" disabled>Yah, Kehabisan!</button>
+                        </div>
+                    `;
+                } else {
+                    // Masih Ada Kuota & Sedang Berjalan
+                    productInfo.innerHTML = `
+                        ${imgHtml}
+                        <div class="fs-details">
+                            <div style="font-weight: 800; font-size: 1.05rem; margin-bottom: 3px; line-height: 1.2;">${promoData.nama_paket}</div>
+                            <div style="font-size: 0.8rem; color: #ff4b2b; font-weight: 700; margin-bottom: 5px;">🔥 Segera Amankan! Sisa ${promoData.kuota_sisa} Paket</div>
+                            <div>
+                                <span class="fs-price-strike">Rp ${promoData.harga_coret.toLocaleString('id-ID')}</span>
+                                <span class="fs-price-new">Rp ${promoData.harga_promo.toLocaleString('id-ID')}</span>
+                            </div>
+                            <button class="fs-btn" onclick="goToOrder('${promoData.id_produk}')">🔥 Amankan Kuota</button>
+                        </div>
+                    `;
+                }
+            } else {
+                // Kondisi Belum Mulai (Tombol Dikunci)
+                productInfo.innerHTML = `
+                    ${imgHtml}
+                    <div class="fs-details">
+                        <div style="font-weight: 800; font-size: 1.05rem; margin-bottom: 5px; color:#888;">${promoData.nama_paket}</div>
+                        <div style="font-size: 0.85rem; color: #333; margin-bottom: 5px;">Kuota Terbatas: <b>${promoData.kuota_sisa} slot</b></div>
+                        <div>
+                            <span class="fs-price-strike">Rp ${promoData.harga_coret.toLocaleString('id-ID')}</span>
+                            <span class="fs-price-new" style="color:#888;">Rp ${promoData.harga_promo.toLocaleString('id-ID')}</span>
+                        </div>
+                        <button class="fs-btn" style="background:#555; cursor:not-allowed;" disabled>🔒 Bersiap Jam ${new Date(promoData.waktu_mulai).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})} WIB</button>
+                    </div>
+                `;
+            }
+        }, 1000);
+    }
+    // ════════════════════════════════════════
+    // FUNGSI PENARIK DATA PROMO DARI GOOGLE SHEETS (API ASLI)
+    // ════════════════════════════════════════
+    // ════════════════════════════════════════
+    // FUNGSI PENARIK DATA PROMO (DENGAN CCTV CONSOLE)
+    // ════════════════════════════════════════
+    function muatDataPromo() {
+        console.log("1. Memulai pencarian Flash Sale...");
+        const urlAPI = GOOGLE_SHEETS_API_URL + "?action=getPromo";
+        
+        fetch(urlAPI)
+            .then(response => {
+                console.log("2. Sinyal dari server diterima, memproses data...");
+                return response.json();
+            })
+            .then(data => {
+                console.log("3. Isi Data Flash Sale:", data);
+                if (data && data.status === 'Aktif') {
+                    console.log("4. Status Aktif! Memicu mesin visual...");
+                    renderFlashSale(data);
+                } else {
+                    console.log('Flash Sale: Tidak ada promo yang sedang aktif.');
+                }
+            })
+            .catch(err => {
+                console.error('CRITICAL ERROR: Gagal menarik data promo. Detail:', err);
+            });
     }
 
+    // Picu penarikan data promo segera setelah kerangka website selesai dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        muatDataPromo();
+    });
+    
     // ════════════════════════════════════════
     // TEMPLATE KARTU PRODUK (Dengan Harga Coret & Hemat)
     // ════════════════════════════════════════

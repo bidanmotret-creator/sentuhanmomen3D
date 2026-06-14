@@ -1005,14 +1005,58 @@
     }
 
     const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec?action=getMenuHarga";
+    // ══ 1. SENSOR ANALITIK INTERNAL ══
+    function kirimAnalitik(aksi, namaProduk, nominal) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        
+        const payload = {
+            jenisForm: 'analitik',
+            jenis_aksi: aksi,
+            nama_produk: namaProduk || '-',
+            asal_mitra: mitra,
+            total_rupiah: nominal || 0
+        };
+
+        // Kirim diam-diam tanpa membebani loading halaman
+        fetch(GOOGLE_SHEETS_API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.log('Sensor tertunda:', err));
+    }
+
+    // ══ 2. LAPORKAN SAAT HALAMAN DIBUKA ══
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => { kirimAnalitik('View_Landing_Page', '-', 0); }, 2000);
+    });
+
     const kodeMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
 // Tambahkan di atas fungsi initPage()
 window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nama: 'Loading...', lokasi: '...', wa: '...' } } };
 
-    async function initPage() {
+   async function initPage() {
         const CACHE_KEY = 'BM_KATALOG_DATA';
         
-        // 1. Coba tampilkan data dari memori HP dulu (Instan)
+        // Dapatkan kode mitra yang sedang aktif dari URL (misal: ?mitra=klinikbunda)
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentMitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+
+        // ▬▬ FUNGSI PENYARING PRODUK KHUSUS MITRA ▬▬
+        function getProductsForCurrentMitra(allProducts) {
+            return allProducts.filter(p => {
+                const target = p.target_mitra ? String(p.target_mitra).toLowerCase().trim() : '';
+                // Jika kolom target kosong, atau tertulis 'semua', tampilkan!
+                if (!target || target === '' || target === 'semua') return true;
+                
+                // Jika ada kode mitra, pisahkan dengan koma dan cek apakah cocok
+                const allowedMitras = target.split(',').map(s => s.trim());
+                return allowedMitras.includes(currentMitra);
+            });
+        }
+
+        // 1. TAMPILKAN DARI MEMORI HP DULU (Instan)
         try {
             const cachedData = localStorage.getItem(CACHE_KEY);
             if (cachedData) {
@@ -1020,30 +1064,34 @@ window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nam
                 if (parsedData.products && parsedData.products.length > 0) {
                     window.WEB_CONFIG.products = parsedData.products;
                     window.WEB_CONFIG.mitra = parsedData.mitra || window.WEB_CONFIG.mitra;
+                    
+                    // Gunakan Filter di sini!
+                    const displayProducts = getProductsForCurrentMitra(window.WEB_CONFIG.products);
+                    
                     renderFilters(); 
-                    renderProducts(window.WEB_CONFIG.products);
+                    renderProducts(displayProducts);
                 }
             }
-        } catch (e) {
-            localStorage.removeItem(CACHE_KEY); // Bersihkan jika memori rusak
-        }
+        } catch (e) { localStorage.removeItem(CACHE_KEY); }
 
         // 2. DIAM-DIAM AMBIL DATA TERBARU DARI GOOGLE
         try {
             const response = await fetch(GOOGLE_SHEETS_API_URL + "&timestamp=" + new Date().getTime());
             const liveConfig = await response.json();
 
-            // Simpan data fresh ke memori HP
             localStorage.setItem(CACHE_KEY, JSON.stringify(liveConfig));
 
-            // SELALU RENDER ULANG LAYAR agar perubahan di Spreadsheet langsung muncul!
             window.WEB_CONFIG.products = liveConfig.products || [];
             window.WEB_CONFIG.mitra = liveConfig.mitra || window.WEB_CONFIG.mitra;
 
+            // Gunakan Filter juga di sini!
+            const displayProducts = getProductsForCurrentMitra(window.WEB_CONFIG.products);
+
             renderFilters(); 
-            renderProducts(window.WEB_CONFIG.products);
+            renderProducts(displayProducts);
             
-            const agen = window.WEB_CONFIG.mitra[kodeMitra] || window.WEB_CONFIG.mitra['pusat'];
+            // Update nama mitra di layar
+            const agen = window.WEB_CONFIG.mitra[currentMitra] || window.WEB_CONFIG.mitra['pusat'];
             if(agen) {
                 const mName = document.getElementById('mitraName');
                 const mLoc = document.getElementById('mitraLokasi');
@@ -1157,6 +1205,12 @@ function tanyaWA() {
     
 // Fungsi untuk mengarahkan ke halaman custom order (A la Carte)
 function goToCustom() {
+    
+    // ▬▬ SENSOR ANALITIK: KLIK PAKET CUSTOM ▬▬
+    kirimAnalitik('Click_Produk', 'Paket Custom A La Carte', 0);
+
+    // ▬▬ LAPOR META PIXEL: VIEW CONTENT ▬▬
+        if (typeof fbq === 'function') fbq('track', 'ViewContent', { content_name: 'Paket Custom A La Carte' });
     // Ambil kode mitra aktif dari URL, jika tidak ada gunakan 'pusat'
     const currentMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
     
@@ -1166,11 +1220,23 @@ function goToCustom() {
 
 // Fungsi untuk mengarahkan ke halaman order dengan parameter produk dan mitra
 function goToOrder(productId) {
-    // Ambil kode mitra dari URL atau gunakan default 'pusat'
+    // 1. Cari dulu nama produknya berdasarkan ID
+    let namaProduk = productId; 
+    if (window.WEB_CONFIG && window.WEB_CONFIG.products) {
+        const product = window.WEB_CONFIG.products.find(p => p.id === productId);
+        if (product) namaProduk = product.name;
+    }
+
+    // ▬▬ SENSOR ANALITIK: KLIK PRODUK ▬▬
+    kirimAnalitik('Click_Produk', namaProduk, 0);
+    // ▬▬ LAPOR META PIXEL: VIEW CONTENT ▬▬
+        if (typeof fbq === 'function') fbq('track', 'ViewContent', { content_name: namaProduk });
     const currentMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
     
-    // Alihkan ke halaman formulir order dengan parameter produk dan mitra
-    window.location.href = `handcasting-custom-order.html?product=${productId}&mitra=${currentMitra}`;
+    // Beri jeda 0.2 detik agar laporan terkirim sebelum pindah halaman
+    setTimeout(() => {
+        window.location.href = `handcasting-custom-order.html?product=${productId}&mitra=${currentMitra}`;
+    }, 200);
 }
 
 // ════════════════════════════════════════

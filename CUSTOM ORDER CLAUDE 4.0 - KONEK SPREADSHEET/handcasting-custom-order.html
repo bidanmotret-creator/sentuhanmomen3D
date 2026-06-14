@@ -616,6 +616,19 @@
             background-position: right bottom; opacity: 0.5; pointer-events: none;
         }
     </style>
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '1390075368460719');
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1390075368460719&ev=PageView&noscript=1"/></noscript>
 </head>
 <body>
 
@@ -812,7 +825,6 @@
                     </div>
                 </div>
             </div>
-        </div>
 
             <div class="summary-box">
                 <div class="summary-row"><span class="label" id="lblBase">Paket Dasar</span><span id="sumBase">Rp 0</span></div>
@@ -826,9 +838,8 @@
                 <button class="btn-prev" onclick="prevStep(1)">← Kembali</button>
                 <button class="btn-next" onclick="nextStep(1)">Lanjut: Jadwal →</button>
             </div>
-        </div>
 
-        <div class="form-step" id="formStep2">
+        </div> <div class="form-step" id="formStep2">
             <div class="section-header">
                 <div class="section-num">3</div>
                 <div>
@@ -968,9 +979,9 @@
     const productId  = urlParams.get('product');
     const isCustom   = urlParams.get('custom') === 'true';
 
-    // Pastikan agen tidak error jika WEB_CONFIG.mitra belum ter-load sempurna
+    // Ubah tulisan 'const agen' menjadi 'let agen' agar nilainya bisa diperbarui!
     const mitraList = window.WEB_CONFIG?.mitra || {};
-    const agen = mitraList[kodeMitra] || mitraList['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
+    let agen = mitraList[kodeMitra] || mitraList['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
     
     let basePrice  = 0;
     let finalTotal = 0;
@@ -997,6 +1008,29 @@
         'Warna List Pinggir Area': 'edge',
         'Warna Label': 'label'
     };
+// ══ 1. SENSOR ANALITIK INTERNAL ══
+    function kirimAnalitik(aksi, namaProduk, nominal) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        // Gunakan URL API yang sama
+        const SENSOR_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec?action=getMenuHarga";
+
+        const payload = {
+            jenisForm: 'analitik',
+            jenis_aksi: aksi,
+            nama_produk: namaProduk || '-',
+            asal_mitra: mitra,
+            total_rupiah: nominal || 0
+        };
+
+        // Kirim diam-diam (background process)
+        fetch(SENSOR_API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.log('Sensor tertunda:', err));
+    }
 
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
     if(document.getElementById('custJadwal')) document.getElementById('custJadwal').min = tomorrow.toISOString().split('T')[0];
@@ -1470,7 +1504,17 @@
 
     function goToStep(n) { if (n <= currentStep) setStep(n); }
     function prevStep(from) { setStep(from - 1); }
-    function nextStep(from) { if (!validateStep(from)) return; if (from === 2) buildReviewPanel(); setStep(from + 1); }
+    function nextStep(from) { 
+        if (!validateStep(from)) return; 
+        
+        // ▬▬ LAPOR META PIXEL: INITIATE CHECKOUT (Saat klien selesai pilih usia anak/produk) ▬▬
+        if (from === 0 && typeof fbq === 'function') {
+            fbq('track', 'InitiateCheckout', { value: basePrice, currency: 'IDR' });
+        }
+
+        if (from === 2) buildReviewPanel(); 
+        setStep(from + 1); 
+    }
     function setStep(n) {
         currentStep = n;
         document.querySelectorAll('.form-step').forEach((s, i) => s.classList.toggle('active', i === n));
@@ -1762,11 +1806,26 @@
         }
         
         // 3. Alihkan ke WhatsApp
+        // 3. Alihkan ke WhatsApp
         tutupModal(); 
+
+        // ▬▬ PELATUK SENSOR: CLOSING / KIRIM WA ▬▬
+        const namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
+        kirimAnalitik('Click_WA_Berhasil', namaPaket, finalTotal);
         
-        // Mengubah teks menjadi format URL yang aman (otomatis mengubah spasi jadi %20 dan enter jadi %0A)
+        // Mengubah teks menjadi format URL yang aman
         const waUrl = `https://wa.me/${agen.wa}?text=${encodeURIComponent(plainMsg)}`;
-        window.open(waUrl, '_blank');
+        if (typeof fbq === 'function') {
+            fbq('track', 'Lead', {
+                content_name: selectedProduct ? selectedProduct.name : 'Custom A la Carte',
+                value: finalTotal,
+                currency: 'IDR'
+            });
+        }
+        // Beri jeda 0.3 detik agar data analitik melesat duluan
+        setTimeout(() => {
+            window.open(waUrl, '_blank');
+        }, 300); 
     }
     
     function scrollToForm() { 
@@ -1794,6 +1853,13 @@
             WEB_CONFIG.biayaLayanan = liveConfig.biayaLayanan || [];
             WEB_CONFIG.customCetakan = liveConfig.customCetakan || [];
             WEB_CONFIG.mitra = liveConfig.mitra || WEB_CONFIG.mitra || {};
+
+            // ▬▬ 1. TAMBAHKAN 3 BARIS INI DI SINI ▬▬
+            // Update data agen dan perbarui teks di layar!
+            agen = WEB_CONFIG.mitra[kodeMitra] || WEB_CONFIG.mitra['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
+            if(document.getElementById('mitraInfoDisplay')) document.getElementById('mitraInfoDisplay').textContent = `${agen.nama} — ${agen.lokasi}`;
+            if(document.getElementById('mitraBadgeHeader')) document.getElementById('mitraBadgeHeader').textContent = agen.nama;
+            // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
             if (isCustom) {
                 selectedProduct = WEB_CONFIG.products.find(p => p.id === 'custom');
@@ -1851,8 +1917,13 @@
             renderDynamicKustomisasi();
             renderAksesoriMenu();
             hitungTotal();
+        // ▬▬ PELATUK SENSOR: FORM DIBUKA ▬▬
+            if (!window.hasTrackedFormView) {
+                const namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
+                kirimAnalitik('View_Form_Order', namaPaket, 0);
+                window.hasTrackedFormView = true; // Mencegah laporan ganda
+            }
         }
-
         // 1. BACA MEMORI LOKAL DULU (INSTAN)
         try {
             const cachedData = localStorage.getItem(CACHE_KEY);

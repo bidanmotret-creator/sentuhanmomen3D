@@ -887,7 +887,7 @@
                 </div>
                 <div class="form-group">
                     <label>No. WhatsApp Aktif <span class="req">*</span></label>
-                    <input type="tel" id="custWa" placeholder="cth: 08123456789" oninput="formatWA(this)">
+                    <input type="tel" id="custWa" placeholder="cth: 08123456789" oninput="formatWA(this)" onblur="lacakLeadTertunda()">
                     <div class="wa-preview" id="waPreview">✅ WA: <span id="waPreviewNum"></span></div>
                     <div class="error-msg" id="errWa">⚠ Minimal 10 digit</div>
                 </div>
@@ -1008,28 +1008,81 @@
         'Warna List Pinggir Area': 'edge',
         'Warna Label': 'label'
     };
-// ══ 1. SENSOR ANALITIK INTERNAL ══
-    function kirimAnalitik(aksi, namaProduk, nominal) {
+
+    // ══ 1. SENSOR UTM PENYIMPAN MEMORI ══
+    function simpanUTM() {
+        const urlParams = new URLSearchParams(window.location.search);
+        // Jika link membawa UTM (dari Meta Ads / IG Story), simpan di memori browser
+        if (urlParams.has('utm_source')) {
+            sessionStorage.setItem('bm_utm_source', urlParams.get('utm_source'));
+            sessionStorage.setItem('bm_utm_medium', urlParams.get('utm_medium') || '-');
+            sessionStorage.setItem('bm_utm_campaign', urlParams.get('utm_campaign') || '-');
+        }
+    }
+    simpanUTM(); // Langsung jalankan saat web dibuka
+
+// ══ SENSOR ANALITIK INTERNAL DENGAN DUKUNGAN LEAD TRACKER ══
+  // ══ SENSOR ANALITIK INTERNAL (DENGAN NAMA & WA TERPISAH) ══
+    function kirimAnalitik(aksi, namaProduk, nominal, namaKlien = '-', waKlien = '-') {
         const urlParams = new URLSearchParams(window.location.search);
         const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
-        // Gunakan URL API yang sama
-        const SENSOR_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec?action=getMenuHarga";
+        
+        const source = urlParams.get('utm_source') || sessionStorage.getItem('bm_utm_source') || 'Organik / Direct';
+        const medium = urlParams.get('utm_medium') || sessionStorage.getItem('bm_utm_medium') || '-';
+        const campaign = urlParams.get('utm_campaign') || sessionStorage.getItem('bm_utm_campaign') || '-';
 
         const payload = {
             jenisForm: 'analitik',
             jenis_aksi: aksi,
             nama_produk: namaProduk || '-',
             asal_mitra: mitra,
-            total_rupiah: nominal || 0
+            total_rupiah: nominal || 0,
+            utm_source: source,
+            utm_medium: medium,
+            utm_campaign: campaign,
+            nama_klien: namaKlien, // <--- Data Terpisah
+            wa_klien: waKlien      // <--- Data Terpisah
         };
 
-        // Kirim diam-diam (background process)
-        fetch(SENSOR_API_URL, {
+        fetch(GOOGLE_SHEETS_API_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         }).catch(err => console.log('Sensor tertunda:', err));
+    }
+
+    // ══ SENSOR PENYADAP NO WA (LEAD TRACKER) - DATA TERPISAH ══
+    function lacakLeadTertunda() {
+        const namaInput = document.getElementById('custName')?.value || 'Anonim';
+        const waInput = document.getElementById('custWa');
+        const nomorWA = waInput ? (waInput.dataset.formatted || waInput.value).replace(/\D/g,'') : '';
+        
+        // Hapus blokade cache sesi sebelumnya jika kita ingin ngetes berkali-kali
+        // window.lastTrackedAbandonedWa = null; // Aktifkan baris ini HANYA JIKA SEDANG TESTING
+        
+        if (nomorWA.length >= 10) {
+            if (window.lastTrackedAbandonedWa === nomorWA) return;
+            window.lastTrackedAbandonedWa = nomorWA;
+
+            let namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
+            
+            if (selectedProduct && selectedProduct.isPhotoPackage && selectedPhotoTier) {
+                namaPaket += " [" + selectedPhotoTier.nama + "]";
+            }
+
+            const csEl = document.getElementById('optCrossSell');
+            let infoCrossSell = "";
+            if (csEl && parseInt(csEl.value) > 0) {
+                const csName = csEl.options[csEl.selectedIndex].getAttribute('data-name');
+                infoCrossSell = " + 🎁 Bundling: " + csName;
+            }
+
+            const paketLengkap = namaPaket + infoCrossSell;
+            
+            // Format Pengiriman: aksi, nama_paket, nominal, nama_klien, nomor_wa
+            kirimAnalitik('Lead_Tertunda', paketLengkap, finalTotal, namaInput, nomorWA);
+        }
     }
 
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1810,8 +1863,13 @@
         tutupModal(); 
 
         // ▬▬ PELATUK SENSOR: CLOSING / KIRIM WA ▬▬
-        const namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
-        kirimAnalitik('Click_WA_Berhasil', namaPaket, finalTotal);
+        let namaPaketLengkap = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
+        if (selectedProduct && selectedProduct.isPhotoPackage && selectedPhotoTier) {
+            namaPaketLengkap += " [" + selectedPhotoTier.nama + "]";
+        }
+        
+        // Kirim analitik closing lengkap dengan Nama dan WA!
+        kirimAnalitik('Click_WA_Berhasil', namaPaketLengkap, finalTotal, d.nama, d.wa);
         
         // Mengubah teks menjadi format URL yang aman
         const waUrl = `https://wa.me/${agen.wa}?text=${encodeURIComponent(plainMsg)}`;

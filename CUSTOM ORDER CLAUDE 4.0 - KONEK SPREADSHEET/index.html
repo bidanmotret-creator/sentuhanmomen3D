@@ -1323,6 +1323,13 @@ function goToOrder(productId) {
 
         grid.innerHTML = finalHtml;
         if(count) count.textContent = validProducts.length + ' paket';
+        // ▬▬ LAPOR META PIXEL: KATALOG UTAMA DILIHAT ▬▬
+        if (typeof fbq === 'function') {
+            fbq('track', 'ViewContent', {
+                content_name: 'Katalog Halaman Depan',
+                content_category: 'Etalase_Utama'
+            });
+        }
     }
 
     // ════════════════════════════════════════

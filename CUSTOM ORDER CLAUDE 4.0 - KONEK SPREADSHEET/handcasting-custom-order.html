@@ -631,7 +631,6 @@
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1390075368460719&ev=PageView&noscript=1"/></noscript>
 </head>
 <body>
-
 <header>
     <a href="index.html" class="back-btn">← Katalog</a>
     <div class="header-title">Form Pemesanan</div>
@@ -690,6 +689,7 @@
 
     <div class="config-section">
 
+        <!-- ════════ STEPS 1: DETAIL PESANAN ════════ -->
         <div class="form-step active" id="formStep0">
             <div class="section-header">
                 <div class="section-num">1</div>
@@ -700,10 +700,13 @@
             </div>
 
             <div id="standardFields">
-                <div class="form-group">
+                <!-- ▬▬ [BARU] TAMBAHKAN ID 'wadahUsiaSubjek' DI BAWAH INI ▬▬ -->
+                <div class="form-group" id="wadahUsiaSubjek">
                     <label>Usia Subjek <span class="req">*</span> <span style="font-size:0.78rem; color:var(--text-muted); font-weight:400;">(mempengaruhi bahan & harga handcasting)</span></label>
                     <select id="optUsia" onchange="hitungTotal()"></select>
                 </div>
+                <!-- ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ -->
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label>Nama Panggilan <span class="req">*</span></label>
@@ -734,6 +737,7 @@
             </div>
         </div>
 
+        <!-- ════════ STEPS 2: KUSTOMISASI TAMPILAN ════════ -->
         <div class="form-step" id="formStep1">
             <div class="section-header">
                 <div class="section-num">2</div>
@@ -749,82 +753,101 @@
                 <div id="photoTierGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;"></div>
             </div>
 
-            <div class="step-section" id="crossSellSection" style="display: none; background: var(--pink-light); padding: 16px; border-radius: 12px; border: 1.5px dashed var(--pink); margin-bottom: 25px;">
-                <h3 id="crossSellTitle" style="color: var(--pink); margin-top: 0; font-size: 1rem;">✨ Spesial Promo Bundling!</h3>
-                <p id="crossSellDesc" style="font-size: 0.82rem; color: var(--text-dark); margin-bottom: 12px;">Lengkapi momen ini. Tambahkan produk pendamping dengan harga subsidi khusus bundling.</p>
-                
-                <div style="display: flex; gap: 14px; align-items: center;">
-                    <img id="crossSellPreviewImg" src="" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow); display: none;">
-                    <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                        <select id="optCrossSell" onchange="updateCrossSellUi(); hitungTotal();" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--pink); font-weight: 600; color: var(--text-dark); background: white;"></select>
-                        <div id="crossSellSavingsBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.8rem; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255, 105, 180, 0.3); width: fit-content; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                            <span style="color: var(--text-muted); text-decoration: line-through;" id="csNormalPrice">Rp 0</span>
-                            <span style="color: #00C896; font-weight: 700;" id="csSavingsPrice">Hemat Rp 0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-section" id="colorPickerSection" style="margin-bottom: 30px;">
-                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎨 Pilih Warna Background dan Bingkai</h3>
-                <p style="color:var(--text-muted); font-size:0.85rem;">Pilih warna favorit untuk setiap bagian. Anda akan dikirim preview design melalui WA</p>
-                
-                <div id="colorPickerContainer" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 15px 0;"></div>
-                
-                <div style="margin-top: 20px; padding: 15px; background: var(--teal-light); border-radius: 12px; border: 1px dashed var(--teal);">
-                    <h4 style="margin-top: 0; font-size: 0.9rem; color: var(--teal);">Preview Material Dipilih:</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 10px; text-align: center;">
-                        <div>
-                            <img id="previewCasting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Cetakan</small>
-                        </div>
-                        <div>
-                            <img id="previewBingkai" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Bingkai</small>
-                        </div>
-                        <div>
-                            <img id="previewBgLuar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">BG Luar</small>
-                        </div>
-                        <div>
-                            <img id="previewBgDalam" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">BG Dalam</small>
-                        </div>
-                        <div>
-                            <img id="previewEdge" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">List Area</small>
-                        </div>
-                        <div>
-                            <img id="previewLabel" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
-                            <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Label</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="step-section" id="aksesoriSection" style="margin-bottom: 20px;">
-                <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎁 Tambahan Aksesoris</h3>
-                <p style="color:var(--text-muted); font-size:0.85rem;">Lengkapi mahakarya Anda dengan detail ekstra (Opsional).</p>
-                
-                <div id="aksesoriGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0;"></div>
-
-                <div style="margin-top: 15px; padding: 15px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="font-size: 2rem;">📸</div>
-                            <div>
-                                <h4 style="margin: 0; font-size: 0.9rem; color: var(--text-dark);">Cetak Foto 5R/4R</h4>
-                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">+Rp 15.000 / lembar</p>
+            <!-- WADAH 1: KHUSUS FOTO (CROSS SELL BUNDLING) -->
+            <div id="wadahCrossSellHandcasting" style="display: none;">
+                <div class="step-section" id="crossSellSection" style="background: var(--pink-light); padding: 16px; border-radius: 12px; border: 1.5px dashed var(--pink); margin-bottom: 25px;">
+                    <h3 id="crossSellTitle" style="color: var(--pink); margin-top: 0; font-size: 1rem;">✨ Spesial Promo Bundling!</h3>
+                    <p id="crossSellDesc" style="font-size: 0.82rem; color: var(--text-dark); margin-bottom: 12px;">Lengkapi momen ini. Tambahkan produk pendamping dengan harga subsidi khusus bundling.</p>
+                    
+                    <div style="display: flex; gap: 14px; align-items: center;">
+                        <img id="crossSellPreviewImg" src="" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow); display: none;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                            <select id="optCrossSell" onchange="cekSilangAksesoris(); updateCrossSellUi(); hitungTotal();" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--pink); font-weight: 600; color: var(--text-dark); background: white;"></select>
+                            
+                            <div id="crossSellSavingsBadge" style="display: none; align-items: center; gap: 8px; font-size: 0.8rem; background: white; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255, 105, 180, 0.3); width: fit-content; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                                <span style="color: var(--text-muted); text-decoration: line-through;" id="csNormalPrice">Rp 0</span>
+                                <span style="color: #00C896; font-weight: 700;" id="csSavingsPrice">Hemat Rp 0</span>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <button type="button" onclick="ubahQtyFoto(-1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: bold; color: var(--teal);">-</button>
-                            <input type="number" id="qtyFoto" value="0" min="0" max="20" style="width: 50px; text-align: center; padding: 5px; border: 1px solid var(--border); border-radius: 6px; font-weight: bold;" readonly>
-                            <button type="button" onclick="ubahQtyFoto(1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: bold; color: var(--teal);">+</button>
-                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- WADAH 2: KHUSUS HANDCASTING (AKSESORIS & BINGKAI) -->
+            <div id="wadahAksesorisBingkai" style="display: none;">
+                
+                <div class="step-section" id="colorPickerSection" style="margin-bottom: 30px;">
+                    <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎨 Pilih Warna Background dan Bingkai</h3>
+                    
+                    <div class="form-group" style="margin: 15px 0;">
+                        <select id="optTanyaWarna" onchange="toggleWadahWarna()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-weight: 500;">
+                            <option value="nanti">Bisa tentukan nanti saat dihubungi admin CS</option>
+                            <option value="sekarang">Ya, saya ingin pilih warna sekarang 🎨</option>
+                        </select>
+                    </div>
+                    
+                    <div id="wadahPemilihanWarna" style="display: none;">
+                        <p style="color:var(--text-muted); font-size:0.85rem;">Pilih warna favorit untuk setiap bagian. Anda akan dikirim preview design melalui WA</p>
+                        
+                        <div id="colorPickerContainer" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 15px 0;"></div>
+                        
+                        <div style="margin-top: 20px; padding: 15px; background: var(--teal-light); border-radius: 12px; border: 1px dashed var(--teal);">
+                            <h4 style="margin-top: 0; font-size: 0.9rem; color: var(--teal);">Preview Material Dipilih:</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 10px; text-align: center;">
+                                <div>
+                                    <img id="previewCasting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Cetakan</small>
+                                </div>
+                                <div>
+                                    <img id="previewBingkai" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Bingkai</small>
+                                </div>
+                                <div>
+                                    <img id="previewBgLuar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">BG Luar</small>
+                                </div>
+                                <div>
+                                    <img id="previewBgDalam" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">BG Dalam</small>
+                                </div>
+                                <div>
+                                    <img id="previewEdge" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">List Area</small>
+                                </div>
+                                <div>
+                                    <img id="previewLabel" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
+                                    <small style="color: var(--text-muted); font-size: 0.6rem; font-weight: 600;">Label</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+
+                <div class="step-section" id="aksesoriSection" style="margin-bottom: 20px;">
+                    <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">🎁 Tambahan Aksesoris</h3>
+                    <p style="color:var(--text-muted); font-size:0.85rem;">Lengkapi mahakarya Anda dengan detail ekstra (Opsional).</p>
+                    
+                    <div id="aksesoriGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 15px 0;"></div>
+
+                    <div style="margin-top: 15px; padding: 15px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 2rem;">📸</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 0.9rem; color: var(--text-dark);">Cetak Foto 5R/4R</h4>
+                                    <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted);">+Rp 15.000 / lembar</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button type="button" onclick="ubahQtyFoto(-1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: bold; color: var(--teal);">-</button>
+                                <input type="number" id="qtyFoto" value="0" min="0" max="20" style="width: 50px; text-align: center; padding: 5px; border: 1px solid var(--border); border-radius: 6px; font-weight: bold;" readonly>
+                                <button type="button" onclick="ubahQtyFoto(1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer; font-weight: bold; color: var(--teal);">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- AKHIR WADAH AKSESORIS -->
 
             <div class="summary-box">
                 <div class="summary-row"><span class="label" id="lblBase">Paket Dasar</span><span id="sumBase">Rp 0</span></div>
@@ -838,8 +861,10 @@
                 <button class="btn-prev" onclick="prevStep(1)">← Kembali</button>
                 <button class="btn-next" onclick="nextStep(1)">Lanjut: Jadwal →</button>
             </div>
+        </div> 
 
-        </div> <div class="form-step" id="formStep2">
+        <!-- ════════ STEPS 3: JADWAL & KONTAK ════════ -->
+        <div class="form-step" id="formStep2">
             <div class="section-header">
                 <div class="section-num">3</div>
                 <div>
@@ -904,6 +929,7 @@
             </div>
         </div>
 
+        <!-- ════════ STEPS 4: REVIEW & KIRIM ════════ -->
         <div class="form-step" id="formStep3">
             <div class="section-header">
                 <div class="section-num">4</div>
@@ -922,7 +948,17 @@
             <div style="background: var(--pink-light); border-radius: 10px; padding: 12px 14px; font-size: 0.82rem; color: var(--text-muted); margin-top: 14px; display: flex; gap: 8px;">
                 <span>💡</span><span>Harga bersifat estimasi. Konfirmasi akhir akan dikirim via WhatsApp.</span>
             </div>
-
+            
+            <!-- ▬▬ INJEKSI WADAH PROMO G-MAPS ▬▬ -->
+            <div id="promoMapsBanner" style="display: none; background: #e8f5e9; border: 2px dashed #4caf50; padding: 15px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px;">
+                <h4 style="color: #2e7d32; margin-top: 0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                    🎁 Kejutan Khusus Hari Ini!
+                </h4>
+                <p style="margin: 0; font-size: 0.88rem; color: #333; line-height: 1.4;">
+                    Dapatkan promo <b>Buy 1 Get 1 Bingkai Cetak Foto (Bayi & Keluarga)</b>! Cukup tunjukkan ulasan Bintang 5 Anda di <b>Google Maps BIDAN MOTRET (Sepang Jaya)</b> kepada tim saat pengerjaan. <i>(Klaim otomatis tertera di struk WhatsApp Anda).</i>
+                </p>
+            </div>
+            
             <button class="btn-submit-wa" onclick="bukaModal()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 Kirim Pesanan via WhatsApp
@@ -966,6 +1002,7 @@
         </div>
     </div>
 </div>
+
 <script src="data-harga.js"></script>
 <script>
     // ════════════════════════════════════════
@@ -979,7 +1016,6 @@
     const productId  = urlParams.get('product');
     const isCustom   = urlParams.get('custom') === 'true';
 
-    // Ubah tulisan 'const agen' menjadi 'let agen' agar nilainya bisa diperbarui!
     const mitraList = window.WEB_CONFIG?.mitra || {};
     let agen = mitraList[kodeMitra] || mitraList['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
     
@@ -1012,17 +1048,15 @@
     // ══ 1. SENSOR UTM PENYIMPAN MEMORI ══
     function simpanUTM() {
         const urlParams = new URLSearchParams(window.location.search);
-        // Jika link membawa UTM (dari Meta Ads / IG Story), simpan di memori browser
         if (urlParams.has('utm_source')) {
             sessionStorage.setItem('bm_utm_source', urlParams.get('utm_source'));
             sessionStorage.setItem('bm_utm_medium', urlParams.get('utm_medium') || '-');
             sessionStorage.setItem('bm_utm_campaign', urlParams.get('utm_campaign') || '-');
         }
     }
-    simpanUTM(); // Langsung jalankan saat web dibuka
+    simpanUTM();
 
-// ══ SENSOR ANALITIK INTERNAL DENGAN DUKUNGAN LEAD TRACKER ══
-  // ══ SENSOR ANALITIK INTERNAL (DENGAN NAMA & WA TERPISAH) ══
+    // ══ SENSOR ANALITIK INTERNAL ══
     function kirimAnalitik(aksi, namaProduk, nominal, namaKlien = '-', waKlien = '-') {
         const urlParams = new URLSearchParams(window.location.search);
         const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
@@ -1040,8 +1074,8 @@
             utm_source: source,
             utm_medium: medium,
             utm_campaign: campaign,
-            nama_klien: namaKlien, // <--- Data Terpisah
-            wa_klien: waKlien      // <--- Data Terpisah
+            nama_klien: namaKlien,
+            wa_klien: waKlien
         };
 
         fetch(GOOGLE_SHEETS_API_URL, {
@@ -1052,21 +1086,17 @@
         }).catch(err => console.log('Sensor tertunda:', err));
     }
 
-    // ══ SENSOR PENYADAP NO WA (LEAD TRACKER) - DATA TERPISAH ══
+    // ══ SENSOR LEAD TRACKER ══
     function lacakLeadTertunda() {
         const namaInput = document.getElementById('custName')?.value || 'Anonim';
         const waInput = document.getElementById('custWa');
         const nomorWA = waInput ? (waInput.dataset.formatted || waInput.value).replace(/\D/g,'') : '';
-        
-        // Hapus blokade cache sesi sebelumnya jika kita ingin ngetes berkali-kali
-        // window.lastTrackedAbandonedWa = null; // Aktifkan baris ini HANYA JIKA SEDANG TESTING
         
         if (nomorWA.length >= 10) {
             if (window.lastTrackedAbandonedWa === nomorWA) return;
             window.lastTrackedAbandonedWa = nomorWA;
 
             let namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
-            
             if (selectedProduct && selectedProduct.isPhotoPackage && selectedPhotoTier) {
                 namaPaket += " [" + selectedPhotoTier.nama + "]";
             }
@@ -1079,8 +1109,6 @@
             }
 
             const paketLengkap = namaPaket + infoCrossSell;
-            
-            // Format Pengiriman: aksi, nama_paket, nominal, nama_klien, nomor_wa
             kirimAnalitik('Lead_Tertunda', paketLengkap, finalTotal, namaInput, nomorWA);
         }
     }
@@ -1090,9 +1118,6 @@
     if(document.getElementById('mitraInfoDisplay')) document.getElementById('mitraInfoDisplay').textContent = `${agen.nama} — ${agen.lokasi}`;
     if(document.getElementById('mitraBadgeHeader')) document.getElementById('mitraBadgeHeader').textContent = agen.nama;
 
-    // ════════════════════════════════════════
-    //  RENDER OPTIONS 
-    // ════════════════════════════════════════
     function renderSelect(data, id) {
         const el = document.getElementById(id);
         if (!el || !data) return;
@@ -1101,44 +1126,55 @@
 
     // ════════════════════════════════════════
     // ════════════════════════════════════════
-    // DYNAMIC KUSTOMISASI (TARGETED CROSS-SELL)
+    // DYNAMIC KUSTOMISASI (SINKRONISASI USIA & WARNA)
     // ════════════════════════════════════════
     function renderDynamicKustomisasi() {
         const isPhoto = selectedProduct?.isPhotoPackage || false;
-        const currentId = selectedProduct?.id || ''; // Ambil ID produk yang sedang dibuka
+        const currentId = selectedProduct?.id || ''; 
         
         const colorSection = document.getElementById('colorPickerSection');
         const photoTierSection = document.getElementById('photoTierSection');
         const crossSellSection = document.getElementById('crossSellSection');
         const crossSellSelect = document.getElementById('optCrossSell');
         
-        // ▬▬ FUNGSI PENYARING CROSS SELL BERDASARKAN ID PRODUK ▬▬
+        const wadahCrossSell = document.getElementById('wadahCrossSellHandcasting');
+        const wadahAksesoris = document.getElementById('wadahAksesorisBingkai');
+        
+        // ▬▬ TANGKAP WADAH USIA (LANGKAH 1) ▬▬
+        const wadahUsia = document.getElementById('wadahUsiaSubjek');
+
         function getFilteredCrossSell(sourceArray) {
             return sourceArray.filter(cs => {
-                if (!cs.target_produk) return false; // Sembunyikan jika kolom target kosong
-                // Pisahkan dengan koma jika ada banyak ID, lalu cek kecocokan
+                if (!cs.target_produk) return false; 
                 const targets = String(cs.target_produk).toLowerCase().split(',').map(s => s.trim());
                 return targets.includes(currentId.toLowerCase()) || targets.includes('semua');
             });
         }
 
+        // Selalu siapkan pilihan warna di latar belakang
+        renderColorPicker(); 
+
         if (isPhoto) {
-            // ▬▬ 1. JIKA PRODUK UTAMA = FOTO ▬▬
-            if(colorSection) colorSection.style.display = 'none'; 
-            if(photoTierSection) photoTierSection.style.display = 'block';
+            // ▬▬ 1. SKENARIO KLIK PAKET FOTO / BINGKAI ▬▬
+            // Sembunyikan pilihan usia di Langkah 1 karena tidak relevan
+            if (wadahUsia) wadahUsia.style.display = 'none'; 
             
-            // Saring cross-sell khusus untuk paket foto ini
+            if (colorSection) colorSection.style.display = 'block'; 
+            if (photoTierSection) photoTierSection.style.display = 'block';
+            
             let filteredCS = getFilteredCrossSell(selectedProduct.crossSellOptions || []);
             
-            if(crossSellSection) {
-                // Hanya munculkan area Cross-Sell jika ada data yang lolos filter
-                crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
-                if(document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '✨ Spesial Promo Bundling Handcasting!';
-                if(document.getElementById('crossSellDesc')) document.getElementById('crossSellDesc').innerHTML = 'Mumpung si kecil sedang sesi foto, abadikan juga ukuran tangannya hari ini dengan harga subsidi khusus.';
-            }
+            if (wadahCrossSell) wadahCrossSell.style.display = filteredCS.length > 0 ? 'block' : 'none';
+            if (crossSellSection) crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
+            
+            // Serahkan kontrol hidup/mati wadah warna & aksesoris ke fungsi saklar interaktif
+            cekSilangAksesoris(); 
+            
+            if (document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '✨ Spesial Promo Bundling Handcasting!';
+            if (document.getElementById('crossSellDesc')) document.getElementById('crossSellDesc').innerHTML = 'Mumpung si kecil sedang sesi foto, abadikan juga ukuran tangannya hari ini dengan harga subsidi khusus.';
             
             const grid = document.getElementById('photoTierGrid');
-            if(grid) {
+            if (grid) {
                 grid.innerHTML = '';
                 if (!selectedPhotoTier && selectedProduct.packageTiers && selectedProduct.packageTiers.length > 0) {
                     selectedPhotoTier = selectedProduct.packageTiers[0]; 
@@ -1150,7 +1186,6 @@
                         const card = document.createElement('div');
                         card.style.cssText = `border: 2px solid ${isSelected ? 'var(--teal)' : 'var(--border)'}; border-radius: 10px; padding: 14px; cursor: pointer; transition: all 0.2s; background: ${isSelected ? 'var(--teal-light)' : 'white'}; display: flex; flex-direction: column; gap: 4px;`;
                         
-                        // Logika Harga Coret untuk Tier
                         const hargaDiskon = tier.harga;
                         const hargaNormal = tier.hargaNormal || 0;
                         const hemat = hargaNormal - hargaDiskon;
@@ -1196,21 +1231,27 @@
             }
 
         } else {
-            // ▬▬ 2. JIKA PRODUK UTAMA = HANDCASTING ▬▬
-            if(colorSection) colorSection.style.display = 'block'; 
-            if(photoTierSection) photoTierSection.style.display = 'none';
+            // ▬▬ 2. SKENARIO KLIK PAKET HANDCASTING ▬▬
+            // Tampilkan kembali kolom pilihan usia karena wajib untuk hitung bahan handcasting
+            if (wadahUsia) wadahUsia.style.display = 'block'; 
 
-            // Saring cross-sell (Foto) khusus untuk paket handcasting ini
+            if (colorSection) colorSection.style.display = 'block'; 
+            if (photoTierSection) photoTierSection.style.display = 'none';
+            if (wadahAksesoris) wadahAksesoris.style.display = 'block';
+
             let filteredCS = getFilteredCrossSell(WEB_CONFIG.crossSellPhoto || []);
             
-            if(crossSellSection) {
-                // Hanya munculkan area Cross-Sell jika ada data yang lolos filter
-                crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
-                if(document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '📸 Tambah Sesi Foto Studio / Homeservice!';
-                if(document.getElementById('crossSellDesc')) document.getElementById('crossSellDesc').innerHTML = 'Sempurnakan karya seni Handcasting ini dengan kenangan foto profesional. Dapatkan harga khusus bundling!';
-            }
+            if (wadahCrossSell) wadahCrossSell.style.display = filteredCS.length > 0 ? 'block' : 'none';
+            if (crossSellSection) crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
+            
+            if (document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '📸 Tambah Sesi Foto Studio / Homeservice!';
+            if (document.getElementById('crossSellDesc')) document.getElementById('crossSellDesc').innerHTML = 'Sempurnakan karya seni Handcasting ini dengan kenangan foto profesional. Dapatkan harga khusus bundling!';
 
-            renderColorPicker(); 
+            const optTanyaWarna = document.getElementById('optTanyaWarna');
+            if (optTanyaWarna) {
+                optTanyaWarna.value = "nanti";
+                toggleWadahWarna();
+            }
 
             if (crossSellSelect) {
                 let optionsHtml = '';
@@ -1225,6 +1266,29 @@
                 crossSellSelect.innerHTML = optionsHtml;
                 updateCrossSellUi(); 
             }
+        }
+    }
+    // ════════════════════════════════════════
+    // FUNGSI SAKLAR LOGIKA PROGRESSIVE DISCLOSURE
+    // ════════════════════════════════════════
+    function cekSilangAksesoris() {
+        const dropdownBundling = document.getElementById('optCrossSell'); 
+        const wadahAksesoris = document.getElementById('wadahAksesorisBingkai');
+        const isPhoto = selectedProduct?.isPhotoPackage || false;
+        
+        if (!dropdownBundling || !wadahAksesoris) return;
+
+        // JIKA FOTO: Kotak Aksesoris hanya muncul kalau Bundle Handcasting dipilih
+        if (isPhoto) {
+            if (dropdownBundling.value === "" || dropdownBundling.value === "0" || dropdownBundling.value === "Tidak, terima kasih") {
+                wadahAksesoris.style.display = 'none';
+            } else {
+                wadahAksesoris.style.display = 'block';
+            }
+        } 
+        // JIKA HANDCASTING: Kotak Aksesoris jangan pernah disembunyikan
+        else {
+            wadahAksesoris.style.display = 'block';
         }
     }
 
@@ -1263,6 +1327,40 @@
         }
     }
 
+    // ════════════════════════════════════════
+    // FUNGSI MEMBUKA/MENUTUP WADAH WARNA
+    // ════════════════════════════════════════
+    function toggleWadahWarna() {
+        const tanyaWarna = document.getElementById('optTanyaWarna').value;
+        const wadahWarna = document.getElementById('wadahPemilihanWarna');
+
+        if (!wadahWarna) return;
+
+        if (tanyaWarna === 'sekarang') {
+            wadahWarna.style.display = 'block';
+            gantiPreviewWarna('putih'); 
+        } else {
+            wadahWarna.style.display = 'none';
+        }
+    }
+
+    function gantiPreviewWarna(kodeWarna) {
+        const imgPreview = document.getElementById('imgPreviewWarna');
+        if (!imgPreview) return;
+
+        const gambarPutih = "https://i.ibb.co/contoh-bingkai-putih.jpg"; 
+        const gambarHitam = "https://i.ibb.co/contoh-bingkai-hitam.jpg";
+        const gambarKayu = "https://i.ibb.co/contoh-bingkai-kayu.jpg";
+
+        if (kodeWarna === 'putih') {
+            imgPreview.src = gambarPutih;
+        } else if (kodeWarna === 'hitam') {
+            imgPreview.src = gambarHitam;
+        } else if (kodeWarna === 'kayu') {
+            imgPreview.src = gambarKayu;
+        }
+    }
+
     function renderColorPicker() {
         const container = document.getElementById('colorPickerContainer');
         if (!container) return;
@@ -1272,7 +1370,7 @@
 
         WEB_CONFIG.customColors.forEach(category => {
             const categoryKey = categoryMap[category.category];
-            if (!categoryKey) return; // Abaikan jika kategori tidak ada di kamus
+            if (!categoryKey) return; 
 
             const categoryDiv = document.createElement('div');
             categoryDiv.style.cssText = `background: white; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border);`;
@@ -1332,7 +1430,6 @@
         hitungTotal(); 
     }
 
-    // 1. GANTI FUNGSI INI AGAR GAMBAR TIDAK ERROR
     function initPreviewImages() {
         const previewMap = {
             'casting': 'previewCasting', 'bingkai': 'previewBingkai', 'bgLuar': 'previewBgLuar', 
@@ -1343,7 +1440,6 @@
         Object.keys(previewMap).forEach(key => {
             const el = document.getElementById(previewMap[key]);
             if (el && selectedColors[key]) {
-                // Jika belum ada gambar, gunakan blank abu-abu agar tidak error
                 el.src = selectedColors[key].image || blankImg;
             }
         });
@@ -1397,7 +1493,6 @@
         hitungTotal();
     }
 
-   /// 2. GANTI FUNGSI INI AGAR KALKULATOR UPSELL BEKERJA UNTUK SEMUA PAKET//
     function hitungTotal() {
         let options = 0;
         const optLayananEl = document.getElementById('optLayanan');
@@ -1406,7 +1501,6 @@
         const isPhoto = selectedProduct?.isPhotoPackage || false;
         let colorCost = 0;
         
-        // Buka gembok! Kalkulasi Cross Sell untuk SEMUA kondisi
         const csEl = document.getElementById('optCrossSell');
         const crossSellCost = csEl ? (parseInt(csEl.value) || 0) : 0;
 
@@ -1548,7 +1642,6 @@
     }
 
     function handleFloatingNext() {
-        // Tombol melayang akan otomatis menekan tombol 'Next' di langkah yang sesuai
         if (currentStep === 0) nextStep(0);
         else if (currentStep === 1) nextStep(1);
         else if (currentStep === 2) nextStep(2);
@@ -1560,7 +1653,6 @@
     function nextStep(from) { 
         if (!validateStep(from)) return; 
         
-        // ▬▬ LAPOR META PIXEL: INITIATE CHECKOUT (Saat klien selesai pilih usia anak/produk) ▬▬
         if (from === 0 && typeof fbq === 'function') {
             fbq('track', 'InitiateCheckout', { value: basePrice, currency: 'IDR' });
         }
@@ -1568,6 +1660,7 @@
         if (from === 2) buildReviewPanel(); 
         setStep(from + 1); 
     }
+    
     function setStep(n) {
         currentStep = n;
         document.querySelectorAll('.form-step').forEach((s, i) => s.classList.toggle('active', i === n));
@@ -1579,7 +1672,6 @@
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // UPDATE TEKS TOMBOL MELAYANG MENGKUTI LANGKAH
         const floatBtn = document.getElementById('floatNextBtn');
         if (floatBtn) {
             if (n === 0 || n === 1) {
@@ -1590,12 +1682,11 @@
                 floatBtn.style.background = 'var(--teal)';
             } else if (n === 3) {
                 floatBtn.textContent = 'Kirim ke WA 🚀';
-                floatBtn.style.background = '#25D366'; // Berubah jadi hijau warna WhatsApp
+                floatBtn.style.background = '#25D366'; 
             }
         }
     }
 
-    // 3. GANTI FUNGSI INI AGAR NOTA & WA MENERIMA DATA UPSELL & 6 WARNA
     function getOrderData() {
         const optLayanan = document.getElementById('optLayanan');
         const layanan = optLayanan ? optLayanan.options[optLayanan.selectedIndex]?.text.split('(')[0].trim() : '';
@@ -1610,7 +1701,14 @@
 
         let warnaStr = "—";
         if (!isPhoto) {
-            warnaStr = `Cetakan: ${selectedColors.casting.nama}, Bingkai: ${selectedColors.bingkai.nama}, BG Luar: ${selectedColors.bgLuar.nama}, BG Dalam: ${selectedColors.bgDalam.nama}, List: ${selectedColors.edge.nama}, Label: ${selectedColors.label.nama}`;
+            const optTanyaWarna = document.getElementById('optTanyaWarna');
+            const statusTanya = optTanyaWarna ? optTanyaWarna.value : 'sekarang';
+
+            if (statusTanya === 'nanti') {
+                warnaStr = "Pilih nanti (Diskusi via WhatsApp)";
+            } else {
+                warnaStr = `Cetakan: ${selectedColors?.casting?.nama || '-'}, Bingkai: ${selectedColors?.bingkai?.nama || '-'}, BG Luar: ${selectedColors?.bgLuar?.nama || '-'}, BG Dalam: ${selectedColors?.bgDalam?.nama || '-'}, List: ${selectedColors?.edge?.nama || '-'}, Label: ${selectedColors?.label?.nama || '-'}`;
+            }
         }
         
         const addonsArr = Object.values(selectedAksesori).map(a => a.nama);
@@ -1618,10 +1716,9 @@
         const qtyFoto = qtyFotoEl ? (parseInt(qtyFotoEl.value) || 0) : 0;
         if (qtyFoto > 0) addonsArr.push(`${qtyFoto}x Foto 5R/4R`);
         
-        // Buka gembok! Rekam nota Cross Sell untuk semua jenis paket
         const csEl = document.getElementById('optCrossSell');
-        if (csEl && csEl.value > 0) {
-            const csName = csEl.options[csEl.selectedIndex].getAttribute('data-name');
+        if (csEl && csEl.value && csEl.value !== "0" && csEl.value !== "Tidak, terima kasih") {
+            const csName = csEl.options[csEl.selectedIndex].getAttribute('data-name') || csEl.options[csEl.selectedIndex].text;
             addonsArr.push(`Bundling: ${csName}`);
         }
         
@@ -1651,14 +1748,10 @@
         return { nama: document.getElementById('custName')?.value || '', wa, paketInfo, subjectInfo, warnaStr, addonsStr, layanan, jadwal, waktu, catatan, alamat };
     }
 
-    // ════════════════════════════════════════
-    //  FUNGSI PEMBANGUN RINCIAN NOTA (BARU)
-    // ════════════════════════════════════════
     function buildReceiptItems() {
         const isPhoto = selectedProduct?.isPhotoPackage || false;
         let items = [];
 
-        // 1. Paket Utama / Cetakan
         if (isCustom) {
             document.querySelectorAll('.cast-item').forEach((row, i) => {
                 const sel = row.querySelector('.custom-cast-select');
@@ -1683,7 +1776,6 @@
             }
         }
 
-        // 2. Material Warna (Hanya tampil di Handcasting)
         if (!isPhoto) {
             const materials = [
                 { k: 'casting', n: 'Cetakan' }, { k: 'bingkai', n: 'Bingkai' },
@@ -1698,26 +1790,22 @@
             });
         }
 
-        // 3. Aksesoris Tambahan
         Object.values(selectedAksesori).forEach(a => {
             items.push({ label: `Ekstra: ${a.nama}`, price: a.harga || 0, isBold: false });
         });
 
-        // 4. Tambahan Cetak Foto
         const qtyFotoEl = document.getElementById('qtyFoto');
         const qtyFoto = qtyFotoEl ? (parseInt(qtyFotoEl.value) || 0) : 0;
         if (qtyFoto > 0) {
             items.push({ label: `${qtyFoto}x Cetak Foto Tambahan`, price: qtyFoto * HARGA_FOTO_PER_LEMBAR, isBold: false });
         }
 
-        // 5. Cross Sell / Bundling
         const csEl = document.getElementById('optCrossSell');
         if (csEl && parseInt(csEl.value) > 0) {
             const csName = csEl.options[csEl.selectedIndex].getAttribute('data-name');
             items.push({ label: `Bundling: ${csName}`, price: parseInt(csEl.value), isBold: true });
         }
 
-        // 6. Layanan Homecare / Studio
         const optLayanan = document.getElementById('optLayanan');
         if (optLayanan) {
             const layName = optLayanan.options[optLayanan.selectedIndex]?.text.split('(')[0].trim();
@@ -1728,15 +1816,11 @@
         return items;
     }
 
-    // ════════════════════════════════════════
-    //  UPDATE REVIEW PANEL (STEP 3)
-    // ════════════════════════════════════════
     function buildReviewPanel() {
         const d = getOrderData();
         const items = buildReceiptItems();
         const isPhoto = selectedProduct?.isPhotoPackage || false;
         
-        // Bagian 1: Informasi Dasar
         let infoRows = [
             ['Pemesan', d.nama], 
             ['WhatsApp', d.wa], 
@@ -1751,7 +1835,6 @@
         html += infoRows.map(([k,v]) => `<div style="display:flex; justify-content:space-between; padding:5px 0; font-size:0.85rem;"><span style="color:var(--text-muted); width: 35%;">${k}</span><span style="font-weight:600; text-align:right; width: 60%; word-break: break-word;">${v || '—'}</span></div>`).join('');
         html += '</div>';
 
-        // Bagian 2: Rincian Biaya (Itemized Receipt)
         html += '<div>';
         html += '<h4 style="margin:0 0 10px 0; font-size:0.95rem; color:var(--teal); border-bottom:1.5px solid #eee; padding-bottom:6px;">Rincian Biaya</h4>';
         
@@ -1777,9 +1860,6 @@
         if(revContent) revContent.innerHTML = html;
     }
 
-    // ════════════════════════════════════════
-    //  UPDATE MODAL KONFIRMASI AKHIR
-    // ════════════════════════════════════════
     function bukaModal() {
         const items = buildReceiptItems();
         const num = '#BM-' + Array.from({length:6}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
@@ -1811,13 +1891,16 @@
     }
 
     // ════════════════════════════════════════
-    //  KIRIM DATA KE WHATSAPP (FORMAT RINCI)
+    //  KIRIM DATA KE WHATSAPP (TERINTEGRASI INSTAGRAM & G-MAPS)
     // ════════════════════════════════════════
     function kirimWA() {
         const d = getOrderData(); 
-        const items = buildReceiptItems(); // Ambil rincian lengkap seperti di nota
+        const items = buildReceiptItems(); 
         const overlay = document.getElementById('modalOverlay');
         const num = overlay ? overlay.dataset.orderNum : '#BM-000';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const mitraSekarang = (urlParams.get('mitra') || 'pusat').toLowerCase();
         
         // 1. Susun Pesan dalam Format Teks Biasa (Plain Text)
         let plainMsg = `Halo *${agen.nama}*, saya ingin konfirmasi pesanan Layanan Bidan Motret:\n\n`;
@@ -1831,9 +1914,7 @@
         
         plainMsg += `*🛒 RINCIAN PESANAN & BIAYA:*\n`;
         
-        // Looping untuk memasukkan semua rincian nota ke dalam chat
         items.forEach(item => {
-            // Beri indentasi panah untuk sub-item (seperti warna/usia)
             let prefix = item.isSub ? '   ↳ ' : '▪️ ';
             let priceStr = item.price > 0 ? `Rp ${item.price.toLocaleString('id-ID')}` : (item.isSub ? 'Gratis' : 'Rp 0');
             plainMsg += `${prefix}${item.label} : *${priceStr}*\n`;
@@ -1841,15 +1922,34 @@
         
         plainMsg += `➖➖➖➖➖➖➖➖➖➖\n`;
         plainMsg += `💰 *TOTAL TAGIHAN: Rp ${finalTotal.toLocaleString('id-ID')}*\n\n`;
+        
         plainMsg += `Mohon konfirmasi ketersediaan jadwalnya ya. 🙏`;
 
+        // ▬▬ [BARU] INJEKSI LINK INSTAGRAM PORTOFOLIO ▬▬
+        // Mengambil data dari tab Database_Mitra (instagramHandle atau ig)
+        const igData = agen.instagramHandle || agen.ig;
+        if (igData && igData.trim() !== '') {
+            // Bersihkan tanda '@' jika admin tidak sengaja mengetiknya di Spreadsheet
+            const cleanIg = igData.replace('@', '').trim();
+            plainMsg += `\n\n📸 *Cek Portofolio Kami:*\nhttps://instagram.com/${cleanIg}`;
+        }
+
+        // ▬▬ INJEKSI TEKS PROMO G-MAPS (KHUSUS PUSAT) ▬▬
+        if (mitraSekarang === 'pusat') {
+            plainMsg += "\n\n🎁 *KLAIM PROMO SPESIAL PUSAT*";
+            plainMsg += "\nSaya ingin mengamankan kuota promo *Buy 1 Get 1 Bingkai Cetak Foto (Bayi & Keluarga)*. Saya bersedia menukarkannya dengan memberikan ulasan Bintang 5 di Google Maps BIDAN MOTRET saat pengerjaan/pengambilan nanti.";
+            plainMsg += "\n\n📍 *Link Review Bidan Motret:* ";
+            plainMsg += "\nhttps://maps.app.goo.gl/7Q1MSxpwcBMF9cnU8?g_st=ipc";
+        }
+
         // 2. Kirim Data Backup ke Google Sheets (Webhook Backend)
-        // Kita tetap menggunakan format ringkas untuk database agar kolom sheet tidak berantakan
         if (GAS_WEBHOOK_URL && GAS_WEBHOOK_URL.startsWith('http')) {
             fetch(GAS_WEBHOOK_URL, { 
                 method:'POST', 
                 body: JSON.stringify({ 
-                    orderNum: num, mitra: kodeMitra, nama: d.nama, wa: d.wa, 
+                    orderNum: num, 
+                    mitra: mitraSekarang, 
+                    nama: d.nama, wa: d.wa, 
                     paket: d.paketInfo, subjek: d.subjectInfo, warna: d.warnaStr, 
                     aksesoris: d.addonsStr, layanan: d.layanan, jadwal: d.jadwal, 
                     waktu: d.waktu, alamat: d.alamat, catatan: d.catatan, total: finalTotal 
@@ -1858,7 +1958,6 @@
             }).catch(e => console.log(e));
         }
         
-        // 3. Alihkan ke WhatsApp
         // 3. Alihkan ke WhatsApp
         tutupModal(); 
 
@@ -1869,10 +1968,13 @@
         }
         
         // Kirim analitik closing lengkap dengan Nama dan WA!
-        kirimAnalitik('Click_WA_Berhasil', namaPaketLengkap, finalTotal, d.nama, d.wa);
+        if (typeof kirimAnalitik === 'function') {
+            kirimAnalitik('Click_WA_Berhasil', namaPaketLengkap, finalTotal, d.nama, d.wa);
+        }
         
         // Mengubah teks menjadi format URL yang aman
         const waUrl = `https://wa.me/${agen.wa}?text=${encodeURIComponent(plainMsg)}`;
+        
         if (typeof fbq === 'function') {
             fbq('track', 'Lead', {
                 content_name: selectedProduct ? selectedProduct.name : 'Custom A la Carte',
@@ -1880,6 +1982,7 @@
                 currency: 'IDR'
             });
         }
+        
         // Beri jeda 0.3 detik agar data analitik melesat duluan
         setTimeout(() => {
             window.open(waUrl, '_blank');
@@ -1898,9 +2001,8 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         const previewNameEl = document.getElementById('previewName');
-        const CACHE_KEY = 'BM_KATALOG_DATA'; // Harus sama dengan index.html
+        const CACHE_KEY = 'BM_KATALOG_DATA'; 
 
-        // Fungsi pemroses data agar tidak perlu diketik dua kali
         function prosesData(liveConfig) {
             window.WEB_CONFIG = window.WEB_CONFIG || {};
             WEB_CONFIG.products = liveConfig.products || [];
@@ -1912,12 +2014,9 @@
             WEB_CONFIG.customCetakan = liveConfig.customCetakan || [];
             WEB_CONFIG.mitra = liveConfig.mitra || WEB_CONFIG.mitra || {};
 
-            // ▬▬ 1. TAMBAHKAN 3 BARIS INI DI SINI ▬▬
-            // Update data agen dan perbarui teks di layar!
             agen = WEB_CONFIG.mitra[kodeMitra] || WEB_CONFIG.mitra['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
             if(document.getElementById('mitraInfoDisplay')) document.getElementById('mitraInfoDisplay').textContent = `${agen.nama} — ${agen.lokasi}`;
             if(document.getElementById('mitraBadgeHeader')) document.getElementById('mitraBadgeHeader').textContent = agen.nama;
-            // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
             if (isCustom) {
                 selectedProduct = WEB_CONFIG.products.find(p => p.id === 'custom');
@@ -1975,14 +2074,14 @@
             renderDynamicKustomisasi();
             renderAksesoriMenu();
             hitungTotal();
-        // ▬▬ PELATUK SENSOR: FORM DIBUKA ▬▬
+
             if (!window.hasTrackedFormView) {
                 const namaPaket = selectedProduct ? selectedProduct.name : 'Custom A la Carte';
                 kirimAnalitik('View_Form_Order', namaPaket, 0);
-                window.hasTrackedFormView = true; // Mencegah laporan ganda
+                window.hasTrackedFormView = true; 
             }
         }
-        // 1. BACA MEMORI LOKAL DULU (INSTAN)
+        
         try {
             const cachedData = localStorage.getItem(CACHE_KEY);
             if (cachedData) {
@@ -1992,13 +2091,10 @@
             }
         } catch(e) { localStorage.removeItem(CACHE_KEY); }
 
-        // 2. DIAM-DIAM AMBIL UPDATE TERBARU DARI GOOGLE
         fetch(GOOGLE_SHEETS_API_URL + "&timestamp=" + new Date().getTime())
             .then(res => res.json())
             .then(liveConfig => {
-                // Simpan ke memori HP
                 localStorage.setItem(CACHE_KEY, JSON.stringify(liveConfig));
-                // SELALU PROSES DATA BARU, agar kalau ada perubahan harga/stok langsung terupdate
                 prosesData(liveConfig);
             })
             .catch(err => {
@@ -2006,5 +2102,14 @@
                 const cekCache = localStorage.getItem(CACHE_KEY);
                 if (!cekCache && previewNameEl) previewNameEl.textContent = 'Gagal memuat. Silakan muat ulang halaman.';
             });
+    });
+
+    // ══ PELATUK VISUAL PROMO G-MAPS ══
+    document.addEventListener("DOMContentLoaded", function() {
+        const paramMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
+        if (paramMitra.toLowerCase() === 'pusat') {
+            const bannerMaps = document.getElementById('promoMapsBanner');
+            if (bannerMaps) bannerMaps.style.display = 'block';
+        }
     });
 </script>

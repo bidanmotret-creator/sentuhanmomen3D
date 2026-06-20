@@ -1036,19 +1036,20 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     
-    // ▬▬ 1. AMBIL URL & SIMPAN KE MEMORI JIKA ADA ▬▬
+    // ▬▬ 1. AMBIL KODE DARI URL & SIMPAN KE MEMORI JIKA ADA ▬▬
     if (urlParams.has('mitra')) {
         sessionStorage.setItem('bm_kode_mitra', urlParams.get('mitra').toLowerCase());
     }
 
     // ▬▬ 2. BACA DARI MEMORI JIKA URL KOSONG (KUNCI AFILIASI) ▬▬
     const kodeMitra = (urlParams.get('mitra') || sessionStorage.getItem('bm_kode_mitra') || 'pusat').toLowerCase();
+    // ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
     const productId  = urlParams.get('product');
     const isCustom   = urlParams.get('custom') === 'true';
 
+    // Ubah tulisan 'const agen' menjadi 'let agen' agar nilainya bisa diperbarui!
     const mitraList = window.WEB_CONFIG?.mitra || {};
-    // Gunakan variabel agen dengan 'let' agar bisa diperbarui secara live nanti
     let agen = mitraList[kodeMitra] || mitraList['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
     
     let basePrice  = 0;
@@ -1090,8 +1091,8 @@
 
     // ══ SENSOR ANALITIK INTERNAL ══
     function kirimAnalitik(aksi, namaProduk, nominal, namaKlien = '-', waKlien = '-') {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        // [PERBAIKAN]: Gunakan variabel kodeMitra dari memori, jangan cari URL lagi
+        const mitra = kodeMitra; 
         
         const source = urlParams.get('utm_source') || sessionStorage.getItem('bm_utm_source') || 'Organik / Direct';
         const medium = urlParams.get('utm_medium') || sessionStorage.getItem('bm_utm_medium') || '-';
@@ -1935,14 +1936,17 @@
     // ════════════════════════════════════════
     //  KIRIM DATA KE WHATSAPP (TERINTEGRASI INSTAGRAM & G-MAPS)
     // ════════════════════════════════════════
+    // ════════════════════════════════════════
+    //  KIRIM DATA KE WHATSAPP (TERINTEGRASI INSTAGRAM & G-MAPS)
+    // ════════════════════════════════════════
     function kirimWA() {
         const d = getOrderData(); 
         const items = buildReceiptItems(); 
         const overlay = document.getElementById('modalOverlay');
         const num = overlay ? overlay.dataset.orderNum : '#BM-000';
         
-        const urlParams = new URLSearchParams(window.location.search);
-        const mitraSekarang = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        // [PERBAIKAN KEBOCORAN]: Hapus 2 baris pencarian URL lama, gunakan kodeMitra!
+        const mitraSekarang = kodeMitra;
         
         // 1. Susun Pesan dalam Format Teks Biasa (Plain Text)
         let plainMsg = `Halo *${agen.nama}*, saya ingin konfirmasi pesanan Layanan Bidan Motret:\n\n`;
@@ -2148,8 +2152,8 @@
 
     // ══ PELATUK VISUAL PROMO G-MAPS ══
     document.addEventListener("DOMContentLoaded", function() {
-        const paramMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
-        if (paramMitra.toLowerCase() === 'pusat') {
+        // [PERBAIKAN]: Gunakan memori kodeMitra
+        if (kodeMitra === 'pusat') {
             const bannerMaps = document.getElementById('promoMapsBanner');
             if (bannerMaps) bannerMaps.style.display = 'block';
         }

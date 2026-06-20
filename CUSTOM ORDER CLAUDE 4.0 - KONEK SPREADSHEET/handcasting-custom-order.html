@@ -1028,17 +1028,27 @@
 <script src="data-harga.js"></script>
 <script>
     // ════════════════════════════════════════
-    //  INIT & STATE VARIABLES
+    // ════════════════════════════════════════
+    //  INIT & STATE VARIABLES (SINKRONISASI MEMORI MITRA)
     // ════════════════════════════════════════
     const GAS_WEBHOOK_URL = window.WEB_CONFIG?.config?.gasWebhookUrl || ""; 
     const HARGA_FOTO_PER_LEMBAR = 15000;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const kodeMitra = urlParams.get('mitra') || 'pusat';
+    
+    // ▬▬ 1. AMBIL URL & SIMPAN KE MEMORI JIKA ADA ▬▬
+    if (urlParams.has('mitra')) {
+        sessionStorage.setItem('bm_kode_mitra', urlParams.get('mitra').toLowerCase());
+    }
+
+    // ▬▬ 2. BACA DARI MEMORI JIKA URL KOSONG (KUNCI AFILIASI) ▬▬
+    const kodeMitra = (urlParams.get('mitra') || sessionStorage.getItem('bm_kode_mitra') || 'pusat').toLowerCase();
+
     const productId  = urlParams.get('product');
     const isCustom   = urlParams.get('custom') === 'true';
 
     const mitraList = window.WEB_CONFIG?.mitra || {};
+    // Gunakan variabel agen dengan 'let' agar bisa diperbarui secara live nanti
     let agen = mitraList[kodeMitra] || mitraList['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512', lokasi: 'Pusat' };
     
     let basePrice  = 0;

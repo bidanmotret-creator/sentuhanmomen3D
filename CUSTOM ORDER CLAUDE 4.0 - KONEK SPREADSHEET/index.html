@@ -49,27 +49,7 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Poppins',sans-serif; background:var(--bg); color:var(--text-dark); }
 
-        /* ══ PROMO BANNER ══ */
-        .promo-banner {
-            background: linear-gradient(90deg, var(--pink), #FF85A2, var(--teal));
-            color: white;
-            text-align: center;
-            padding: 10px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-        }
-        .promo-banner::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer { to { left: 100%; } }
-        .promo-banner span { opacity: 0.9; margin: 0 6px; }
+        
 
         /* ══ HEADER ══ */
         header {
@@ -866,11 +846,6 @@
 </head>
 <body>
 
-<!-- PROMO BANNER -->
-<div class="promo-banner">
-    🎉 Early Bird — Diskon 30% untuk 20 Order di Bulan Juni ini <span>·</span> Gratis Homeservice Bandar Lampung <span>·</span> 🎁
-</div>
-
 <!-- HEADER -->
 <header>
     <div class="logo">HANDCASTING 3D & 2D</div>
@@ -1173,16 +1148,25 @@
     }
 
     const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
+    
+    // ════════════════════════════════════════════════════════════════════
+    // ▬▬ 1. KUNCI KODE MITRA KE MEMORI BROWSER JIKA ADA DI URL ▬▬
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('mitra')) {
+        sessionStorage.setItem('bm_kode_mitra', urlParams.get('mitra').toLowerCase());
+    }
+
+    // ▬▬ 2. BACA DENGAN PRIORITAS: 1. URL Saat Ini, 2. Memori Browser, 3. Default Pusat ▬▬
+    const kodeMitra = (urlParams.get('mitra') || sessionStorage.getItem('bm_kode_mitra') || 'pusat').toLowerCase();
+    // ════════════════════════════════════════════════════════════════════
+
     // ══ 1. SENSOR ANALITIK INTERNAL ══
     function kirimAnalitik(aksi, namaProduk, nominal) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
-        
         const payload = {
             jenisForm: 'analitik',
             jenis_aksi: aksi,
             nama_produk: namaProduk || '-',
-            asal_mitra: mitra,
+            asal_mitra: kodeMitra, // Menggunakan kodeMitra yang sudah terkunci
             total_rupiah: nominal || 0
         };
 
@@ -1200,16 +1184,14 @@
         setTimeout(() => { kirimAnalitik('View_Landing_Page', '-', 0); }, 2000);
     });
 
-    const kodeMitra = new URLSearchParams(window.location.search).get('mitra') || 'pusat';
-// Tambahkan di atas fungsi initPage()
-window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nama: 'Loading...', lokasi: '...', wa: '...' } } };
+    // Tambahkan di atas fungsi initPage()
+    window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nama: 'Loading...', lokasi: '...', wa: '...' } } };
 
-   async function initPage() {
+    async function initPage() {
         const CACHE_KEY = 'BM_KATALOG_DATA';
         
-        // Dapatkan kode mitra yang sedang aktif dari URL (misal: ?mitra=klinikbunda)
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentMitra = (urlParams.get('mitra') || 'pusat').toLowerCase();
+        // Gunakan kodeMitra yang sudah kita amankan di atas
+        const currentMitra = kodeMitra;
 
         // ▬▬ FUNGSI PENYARING PRODUK KHUSUS MITRA ▬▬
         function getProductsForCurrentMitra(allProducts) {
@@ -1272,18 +1254,19 @@ window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nam
             console.error("Gagal sinkronisasi katalog:", err);
         }
     }
+    
     const badgeClass = { 
-    'Best Seller': 'badge-bestseller',
-    'Populer': 'badge-populer',
-    'Premium': 'badge-premium',
-    'Hemat': 'badge-hemat',
-    'Istimewa': 'badge-premium',
-    'Thematic Best': 'badge-premium',
-    'Family Choice': 'badge-premium',
-    'Cheerful': 'badge-hemat',
-    'Celebration': 'badge-bestseller',
-    'Professional': 'badge-populer' 
-};
+        'Best Seller': 'badge-bestseller',
+        'Populer': 'badge-populer',
+        'Premium': 'badge-premium',
+        'Hemat': 'badge-hemat',
+        'Istimewa': 'badge-premium',
+        'Thematic Best': 'badge-premium',
+        'Family Choice': 'badge-premium',
+        'Cheerful': 'badge-hemat',
+        'Celebration': 'badge-bestseller',
+        'Professional': 'badge-populer' 
+    };
 
 // ════════════════════════════════════════
     // FUNGSI HERO SLIDER (AUTO PLAY & GESER)

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP Rewards - Bidan Motret</title>
+    <style>
+        :root {
+            --teal: #009688;
+            --teal-light: #e0f2f1;
+            --pink: #ff4081;
+            --pink-light: #fce4ec;
+            --bg: #fafafa;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border: #eaeded;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --gold: #ffc107;
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background-color: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+
+        /* ▬▬ HEADER ▬▬ */
+        header {
+            background: white; padding: 15px 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .back-btn { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+        .header-title { font-weight: 800; color: var(--teal); font-size: 1.1rem; }
+
+        /* ▬▬ HERO BANNER ▬▬ */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--teal), #00796b);
+            color: white; padding: 40px 20px 50px 20px;
+            text-align: center; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
+            position: relative; overflow: hidden;
+        }
+        .hero-banner h1 { margin: 0; font-size: 1.8rem; font-weight: 900; }
+        .hero-banner p { margin: 10px 0 0 0; font-size: 0.9rem; line-height: 1.5; opacity: 0.9; }
+        .total-value {
+            display: inline-block; margin-top: 15px; padding: 8px 16px;
+            background: rgba(255,255,255,0.2); border-radius: 20px;
+            font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        /* ▬▬ KONTEN UTAMA ▬▬ */
+        .container { max-width: 600px; margin: -25px auto 0 auto; padding: 0 20px; position: relative; z-index: 10; }
+
+        /* CARA KLAIM */
+        .how-to { background: white; padding: 20px; border-radius: 15px; box-shadow: var(--shadow); margin-bottom: 25px; }
+        .how-to h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--text-dark); display: flex; align-items: center; gap: 8px; }
+        .step-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .step-num { 
+            background: var(--pink-light); color: var(--pink); font-weight: 800; 
+            width: 24px; height: 24px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0;
+        }
+        .step-text { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; margin: 0; }
+
+        /* LABEL KATEGORI */
+        .tier-label { font-size: 0.9rem; font-weight: 800; color: var(--text-muted); margin: 30px 0 15px 0; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* VENDOR CARD (UNLOCKED) */
+        .vendor-card {
+            background: white; border-radius: 16px; padding: 16px; margin-bottom: 15px;
+            box-shadow: var(--shadow); display: flex; gap: 15px; align-items: center;
+            border-left: 5px solid var(--teal); transition: transform 0.2s;
+        }
+        .vendor-logo {
+            width: 60px; height: 60px; border-radius: 12px; background: #f0f0f0;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .vendor-info { flex: 1; }
+        .vendor-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .vendor-promo { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); margin: 0 0 6px 0; line-height: 1.2; }
+        .vendor-terms { font-size: 0.75rem; color: var(--text-muted); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .badge-ready { background: var(--teal-light); color: var(--teal); font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: 800; display: inline-block; margin-top: 6px; }
+
+        /* VENDOR CARD (LOCKED) */
+        .vendor-card.locked {
+            border-left: 5px solid #bdc3c7; background: #fdfdfd; opacity: 0.85;
+            filter: grayscale(80%); position: relative;
+        }
+        .vendor-card.locked .badge-ready { background: #f2f4f4; color: #7f8c8d; }
+        .locked-overlay {
+            margin-top: 10px; background: rgba(0,0,0,0.04); padding: 8px 12px; border-radius: 8px;
+            font-size: 0.75rem; color: #e67e22; font-weight: 600; display: flex; align-items: center; gap: 6px;
+            border: 1px dashed #e67e22;
+        }
+
+        .cta-box { background: var(--pink-light); border: 2px dashed var(--pink); border-radius: 15px; padding: 20px; text-align: center; margin-top: 30px; }
+        .cta-box h4 { margin: 0 0 8px 0; color: var(--pink); font-size: 1.1rem; }
+        .cta-box p { font-size: 0.85rem; color: var(--text-dark); margin: 0 0 15px 0; line-height: 1.4; }
+        .btn-booking { background: var(--pink); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: inline-block; width: 100%; box-shadow: 0 4px 10px rgba(255, 64, 129, 0.3); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <!-- Arahkan kembali ke katalog / form order Anda -->
+        <a href="index.html" class="back-btn">← Form Pemesanan</a>
+        <div class="header-title">VIP Privilege</div>
+        <div style="width: 20px;"></div> <!-- Spacer -->
+    </header>
+
+    <div class="hero-banner">
+        <h1>Bidan Motret Rewards</h1>
+        <p>Nikmati puluhan keuntungan eksklusif dari bisnis & klinik partner terbaik di Bandar Lampung khusus untuk Bunda.</p>
+        <div class="total-value">🎁 Total Bonus Senilai Rp 1.500.000+</div>
+    </div>
+
+    <div class="container">
+        
+        <!-- CARA KLAIM -->
+        <div class="how-to">
+            <h3>Cara Klaim Voucher 💡</h3>
+            <div class="step-row">
+                <div class="step-num">1</div>
+                <p class="step-text">Selesaikan pemesanan layanan foto atau handcasting di Bidan Motret.</p>
+            </div>
+            <div class="step-row">
+                <div class="step-num">2</div>
+                <p class="step-text">Nomor Pesanan Anda (contoh: <b>#BM-A1B2C</b>) yang tertera di nota WA otomatis berfungsi sebagai Kode VIP.</p>
+            </div>
+            <div class="step-row">
+                <div class="step-num">3</div>
+                <p class="step-text">Tunjukkan *chat* nota tersebut ke admin / kasir vendor partner kami di bawah ini untuk mendapatkan diskon langsung.</p>
+            </div>
+        </div>
+
+        <!-- TIER 1: LANGSUNG DAPAT -->
+        <div class="tier-label">✨ Tersedia Untuk Semua Klien</div>
+
+        <!-- Kartu Partner 1 -->
+        <div class="vendor-card">
+            <div class="vendor-logo">👶</div>
+            <div class="vendor-info">
+                <div class="vendor-name">Klinik Kandungan Sepang Jaya</div>
+                <h4 class="vendor-promo">Potongan Rp 100.000 USG 4D</h4>
+                <p class="vendor-terms">Berlaku khusus untuk pendaftaran di hari kerja (Senin-Jumat). Wajib reservasi H-1.</p>
+                <div class="badge-ready">Siap Diklaim</div>
+            </div>
+        </div>
+
+        <!-- Kartu Partner 2 -->
+        <div class="vendor-card">
+            <div class="vendor-logo">🛁</div>
+            <div class="vendor-info">
+                <div class="vendor-name">Little Joy Baby Spa</div>
+                <h4 class="vendor-promo">Diskon 20% All Treatment</h4>
+                <p class="vendor-terms">Berlaku untuk paket pijat bayi, renang, dan cukur rambut. Berlaku 3 bulan sejak sesi foto.</p>
+                <div class="badge-ready">Siap Diklaim</div>
+            </div>
+        </div>
+
+        <!-- TIER 2: TERKUNCI (GAMIFICATION) -->
+        <div class="tier-label">👑 Spesial Golden Ticket</div>
+
+        <!-- Kartu Partner 3 (Terkunci) -->
+        <div class="vendor-card locked">
+            <div class="vendor-logo">🍱</div>
+            <div class="vendor-info">
+                <div class="vendor-name">Berkah Aqiqah Lampung</div>
+                <h4 class="vendor-promo">Gratis Ekstra 50 Box Nasi</h4>
+                <p class="vendor-terms">Dapatkan tambahan 50 box untuk pemesanan paket aqiqah tipe apapun.</p>
+                
+                <!-- Pesan Syarat Threshold -->
+                <div class="locked-overlay">
+                    🔒 Terkunci. (Syarat: Minimal transaksi di Bidan Motret Rp 2.500.000)
+                </div>
+            </div>
+        </div>
+
+        <!-- Kartu Partner 4 (Terkunci) -->
+        <div class="vendor-card locked">
+            <div class="vendor-logo">🛒</div>
+            <div class="vendor-info">
+                <div class="vendor-name">Sewa Stroller Premium</div>
+                <h4 class="vendor-promo">Voucher Potongan Rp 250.000</h4>
+                <p class="vendor-terms">Bebas pilih tipe stroller cabin size. Syarat penyewaan minimal 1 minggu.</p>
+                
+                <div class="locked-overlay">
+                    🔒 Terkunci. (Syarat: Hanya untuk pendaftar di Bulan Juli)
+                </div>
+            </div>
+        </div>
+
+        <!-- CALL TO ACTION -->
+        <div class="cta-box">
+            <h4>Belum Punya Nomor Pesanan?</h4>
+            <p>Amankan jadwal sesi si Kecil hari ini dan *unlock* semua bonus VIP di atas sekarang juga!</p>
+            <a href="index.html" class="btn-booking">Buat Pesanan Sekarang 🚀</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

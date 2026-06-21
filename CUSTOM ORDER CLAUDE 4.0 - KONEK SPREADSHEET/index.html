@@ -1150,6 +1150,7 @@
     const GOOGLE_SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
     
     // ════════════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════════
     // ▬▬ 1. KUNCI KODE MITRA KE MEMORI BROWSER JIKA ADA DI URL ▬▬
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('mitra')) {
@@ -1160,14 +1161,32 @@
     const kodeMitra = (urlParams.get('mitra') || sessionStorage.getItem('bm_kode_mitra') || 'pusat').toLowerCase();
     // ════════════════════════════════════════════════════════════════════
 
+    // ▬▬ [BARU] SENSOR UTM PENYIMPAN MEMORI ▬▬
+    function simpanUTM() {
+        if (urlParams.has('utm_source')) {
+            sessionStorage.setItem('bm_utm_source', urlParams.get('utm_source'));
+            sessionStorage.setItem('bm_utm_medium', urlParams.get('utm_medium') || '-');
+            sessionStorage.setItem('bm_utm_campaign', urlParams.get('utm_campaign') || '-');
+        }
+    }
+    simpanUTM(); // Langsung jalankan saat halaman katalog dibuka!
+
     // ══ 1. SENSOR ANALITIK INTERNAL ══
     function kirimAnalitik(aksi, namaProduk, nominal) {
+        // Tarik data UTM dari URL atau dari memori yang barusan disimpan
+        const source = urlParams.get('utm_source') || sessionStorage.getItem('bm_utm_source') || 'Organik / Direct';
+        const medium = urlParams.get('utm_medium') || sessionStorage.getItem('bm_utm_medium') || '-';
+        const campaign = urlParams.get('utm_campaign') || sessionStorage.getItem('bm_utm_campaign') || '-';
+
         const payload = {
             jenisForm: 'analitik',
             jenis_aksi: aksi,
             nama_produk: namaProduk || '-',
-            asal_mitra: kodeMitra, // Menggunakan kodeMitra yang sudah terkunci
-            total_rupiah: nominal || 0
+            asal_mitra: kodeMitra, 
+            total_rupiah: nominal || 0,
+            utm_source: source,       // <-- Masukkan data UTM ke payload
+            utm_medium: medium,       // <-- Masukkan data UTM ke payload
+            utm_campaign: campaign    // <-- Masukkan data UTM ke payload
         };
 
         // Kirim diam-diam tanpa membebani loading halaman
@@ -1183,7 +1202,7 @@
     window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { kirimAnalitik('View_Landing_Page', '-', 0); }, 2000);
     });
-
+    
     // Tambahkan di atas fungsi initPage()
     window.WEB_CONFIG = window.WEB_CONFIG || { products: [], mitra: { 'pusat': { nama: 'Loading...', lokasi: '...', wa: '...' } } };
 
@@ -1330,8 +1349,19 @@
 
 // Tambahkan di dalam blok <script> Anda
 function tanyaWA() {
-    const nomorWA = "6282177272512";
-    const pesan = "Halo tim Bidan Motret, saya ingin konsultasi layanan handcasting.";
+    // 1. Tarik data mitra yang sedang aktif dari memori konfigurasi
+    const agen = window.WEB_CONFIG?.mitra?.[kodeMitra] || window.WEB_CONFIG?.mitra?.['pusat'] || { nama: 'Bidan Motret Pusat', wa: '6282177272512' };
+    
+    // 2. Siapkan Nomor WA dan Pesan Dinamis sesuai nama Mitra
+    const nomorWA = agen.wa;
+    const pesan = `Halo tim Bidan Motret, saya ingin konsultasi layanan dari ${agen.nama}.`;
+    
+    // 3. (Opsional tapi Penting) Rekam aktivitas klik ini ke Google Sheets sebagai "Lead Tanya-tanya"
+    if (typeof kirimAnalitik === 'function') {
+        kirimAnalitik('Click_Tanya_WA_Katalog', 'Konsultasi Bottom CTA', 0);
+    }
+
+    // 4. Rakit URL dan eksekusi
     const url = `https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`;
     
     // Buka di tab baru

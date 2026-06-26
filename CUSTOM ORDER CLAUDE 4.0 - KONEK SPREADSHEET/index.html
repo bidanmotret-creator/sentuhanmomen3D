@@ -830,6 +830,202 @@
             flex-direction: column;
             flex-grow: 1;
         }
+
+        /* ════════════════════════════════════════
+       ══ VIP GATE (LEAD CAPTURE) STYLES ══
+       ════════════════════════════════════════ */
+    #vipGateOverlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(26, 26, 46, 0.95);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(8px);
+        transition: opacity 0.4s ease;
+    }
+
+    .vip-card {
+        background: white;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 24px;
+        padding: 30px 25px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        text-align: center;
+        position: relative;
+        animation: slideUpGate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideUpGate {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .vip-icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+
+    .vip-card h2 {
+        font-family: 'Fredoka', sans-serif;
+        color: var(--teal);
+        margin: 0 0 10px 0;
+        font-size: 1.5rem;
+    }
+
+    .vip-card p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0 0 25px 0;
+        line-height: 1.5;
+    }
+
+    .vip-form-group {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+
+    .vip-form-group label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 6px;
+    }
+
+    .vip-form-group input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+        background: var(--bg);
+    }
+
+    .vip-form-group input:focus {
+        outline: none;
+        border-color: var(--teal);
+        background: white;
+        box-shadow: 0 0 0 4px var(--teal-light);
+    }
+
+    .btn-unlock {
+        background: linear-gradient(135deg, var(--teal), #008B8B);
+        color: white;
+        border: none;
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        font-family: 'Fredoka', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-unlock:active {
+        transform: scale(0.98);
+    }
+    
+    /* Tombol Lewati (Opsional) */
+    .btn-skip {
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin-top: 15px;
+        text-decoration: underline;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* ════════════════════════════════════════
+       ══ SHOPEE STYLE 2-COLUMN GRID (MOBILE) ══
+       ════════════════════════════════════════ */
+    @media (max-width: 600px) {
+        /* Paksa grid produk membelah jadi 2 kolom */
+        #productsGrid {
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+            padding: 10px 5px !important;
+        }
+
+        /* Rapikan struktur kartu agar tingginya seragam */
+        .product-card {
+            margin-bottom: 0 !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+        }
+
+        /* Buat foto produk kotak proporsional */
+        .card-image {
+            height: 150px !important;
+        }
+
+        .card-body {
+            padding: 8px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 !important;
+        }
+
+        /* Kunci nama produk maksimal 2 baris agar rapi sejajar */
+        .card-name {
+            font-size: 0.85rem !important;
+            line-height: 1.3 !important;
+            height: 2.6em !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            margin-bottom: 4px !important;
+        }
+
+        /* 🔥 MUNCULKAN SEDIKIT DESKRIPSI SEBAGAI TEASER (Maks 2 Baris) */
+        .card-desc {
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important; /* Batasi maksimal 2 baris saja */
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            font-size: 0.7rem !important; /* Huruf dikecilkan agar elegan */
+            line-height: 1.3 !important;
+            margin-bottom: 8px !important;
+            color: #777 !important; /* Warna dikelabukan agar tidak nabrak dengan nama produk */
+        }
+
+        /* Rapatkan area harga */
+        .card-price {
+            min-height: auto !important;
+            margin-top: auto !important;
+            padding: 4px 0 !important;
+        }
+
+        .price-main {
+            font-size: 0.95rem !important; 
+        }
+
+        /* Kecilkan sedikit tombol aksi agar proporsional di 2 kolom */
+        .card-cta {
+            padding: 8px !important;
+            font-size: 0.75rem !important;
+            border-radius: 8px !important;
+            margin-top: 8px !important;
+        }
+        
+        /* Matikan efek hover hitam yang mengganggu saat layar di-scroll pakai jari */
+        .card-overlay {
+            display: none !important;
+        }
+    }
     </style>
     <script>
         !function(f,b,e,v,n,t,s)
@@ -845,7 +1041,32 @@
     </script>
 </head>
 <body>
+<div id="vipGateOverlay">
+        <div class="vip-card">
+            <div class="vip-icon">✨</div>
+            <h2>Akses Katalog & Dapatkan Promo Spesial</h2>
+            <p>Halo Bunda! Masukkan data singkat untuk melihat harga lengkap dan promo khusus di kota Bunda hari ini.</p>
+            
+            <div class="vip-form-group">
+                <label>Nama Bunda / Panggilan</label>
+                <input type="text" id="leadName" placeholder="Contoh: Bunda Sarah" required>
+            </div>
+            
+            <div class="vip-form-group">
+                <label>Nomor WhatsApp Aktif</label>
+                <input type="tel" id="leadWa" placeholder="0812xxxxxx" required oninput="formatWAGate(this)">
+            </div>
+            
+            <div class="vip-form-group">
+                <label>Domisili / Kota</label>
+                <input type="text" id="leadCity" placeholder="Contoh: Bandar Lampung" required>
+            </div>
 
+            <button class="btn-unlock" onclick="unlockKatalog()">Buka Katalog Promo Sekarang 🔓</button>
+            
+            <button class="btn-skip" onclick="lewatiGate()">Nanti saja, saya cuma mau lihat-lihat</button>
+        </div>
+    </div>
 <!-- HEADER -->
 <header>
     <div class="logo">HANDCASTING 3D & 2D</div>
@@ -1170,9 +1391,85 @@
         }
     }
     simpanUTM(); // Langsung jalankan saat halaman katalog dibuka!
+// ════════════════════════════════════════
+    //  FUNGSI VIP GATE (LEAD CAPTURE)
+    // ════════════════════════════════════════
+    
+    // Cek apakah pengunjung sudah pernah mengisi form (agar tidak ditodong terus-terusan)
+    document.addEventListener('DOMContentLoaded', () => {
+        const isUnlocked = localStorage.getItem('bm_katalog_unlocked');
+        if (isUnlocked) {
+            document.getElementById('vipGateOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Kembalikan scroll
+        } else {
+            // Kunci layar agar tidak bisa di-scroll sebelum isi form
+            document.body.style.overflow = 'hidden'; 
+        }
+    });
 
-    // ══ 1. SENSOR ANALITIK INTERNAL ══
-    function kirimAnalitik(aksi, namaProduk, nominal) {
+    // Format nomor WA sederhana untuk Gate
+    function formatWAGate(input) {
+        input.value = input.value.replace(/\D/g, '');
+    }
+
+    function unlockKatalog() {
+        const nama = document.getElementById('leadName').value.trim();
+        const waInput = document.getElementById('leadWa').value;
+        const kota = document.getElementById('leadCity').value.trim();
+        
+        let wa = waInput;
+        if (wa.startsWith('08')) wa = '62' + wa.slice(1);
+        if (wa.startsWith('8')) wa = '62' + wa;
+
+        // Validasi
+        if (!nama || wa.length < 10 || !kota) {
+            alert("Mohon lengkapi Nama, Nomor WA yang valid (min. 10 angka), dan Kota ya Bunda 🙏");
+            return;
+        }
+
+        // 1. Simpan ke Memori agar tidak ditanya lagi
+        localStorage.setItem('bm_katalog_unlocked', 'true');
+        localStorage.setItem('bm_lead_nama', nama);
+        localStorage.setItem('bm_lead_wa', wa);
+        localStorage.setItem('bm_lead_kota', kota);
+
+        // 2. Kirim Data ke Google Sheets (Trik: Gunakan fungsi kirimAnalitik yang sudah ada!)
+        // Format pengiriman: Aksi, Nama Produk, Nominal, Nama Klien, WA Klien
+        // Kita manfaatkan kolom "Nama Produk" untuk menyisipkan info Kota
+        const infoProduk = `[LEAD BARU] Kota: ${kota}`;
+        kirimAnalitik('Lead_Capture_Depan', infoProduk, 0, nama, wa);
+
+        // Lapor ke Meta Pixel (Sangat Penting buat iklan!)
+        if (typeof fbq === 'function') {
+            fbq('track', 'Lead', { content_name: 'VIP Catalog Access' });
+        }
+
+        // 3. Buka Gerbang
+        const gate = document.getElementById('vipGateOverlay');
+        gate.style.opacity = '0';
+        setTimeout(() => {
+            gate.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Kembalikan scroll
+        }, 400);
+    }
+
+    // Fungsi jika pengunjung memilih "Nanti saja"
+    function lewatiGate() {
+        // Tetap simpan tanda sudah masuk, agar tidak ditodong terus saat nge-refresh
+        sessionStorage.setItem('bm_katalog_unlocked', 'true'); // Pakai sessionStorage biar kalau tab ditutup, ditodong lagi
+        
+        kirimAnalitik('Skip_Lead_Capture', '-', 0);
+
+        const gate = document.getElementById('vipGateOverlay');
+        gate.style.opacity = '0';
+        setTimeout(() => {
+            gate.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 400);
+    }
+
+    // ══ 1. SENSOR ANALITIK INTERNAL (PERBAIKAN LEAD CAPTURE) ══
+    function kirimAnalitik(aksi, namaProduk, nominal, namaKlien = '-', waKlien = '-') {
         // Tarik data UTM dari URL atau dari memori yang barusan disimpan
         const source = urlParams.get('utm_source') || sessionStorage.getItem('bm_utm_source') || 'Organik / Direct';
         const medium = urlParams.get('utm_medium') || sessionStorage.getItem('bm_utm_medium') || '-';
@@ -1186,7 +1483,9 @@
             total_rupiah: nominal || 0,
             utm_source: source,       // <-- Masukkan data UTM ke payload
             utm_medium: medium,       // <-- Masukkan data UTM ke payload
-            utm_campaign: campaign    // <-- Masukkan data UTM ke payload
+            utm_campaign: campaign,   // <-- Masukkan data UTM ke payload
+            nama_klien: namaKlien,    // ◄▬▬ TAMBAHAN BARU: Kursi untuk Nama
+            wa_klien: waKlien         // ◄▬▬ TAMBAHAN BARU: Kursi untuk WA
         };
 
         // Kirim diam-diam tanpa membebani loading halaman

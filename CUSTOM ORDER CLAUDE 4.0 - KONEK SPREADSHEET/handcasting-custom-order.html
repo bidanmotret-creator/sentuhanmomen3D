@@ -636,6 +636,31 @@
         background: #ccc;
         border-radius: 10px;
     }
+
+    /* ════════════════════════════════════════
+       ══ RESPONSIVE YOUTUBE GALLERY ══
+       ════════════════════════════════════════ */
+    .video-gallery {
+        margin-bottom: 25px;
+        padding: 0 10px;
+    }
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* Rasio 16:9 */
+        height: 0;
+        overflow: hidden;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        background: #000;
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
     </style>
     <script>
         !function(f,b,e,v,n,t,s)
@@ -707,6 +732,14 @@
             <div id="includesList"></div>
         </div>
     </div>
+
+    <!-- Cukup gunakan ini saja, sistem akan mengisi isinya secara otomatis -->
+<div class="video-gallery" id="videoGalleryContainer" style="display:none;">
+    <h4 style="margin-bottom: 15px; color: var(--teal);">🎥 Intip Hasil Karya Kami</h4>
+    <div id="youtubeSection" class="video-container">
+        <!-- Iframe akan muncul di sini secara otomatis -->
+    </div>
+</div>
 
     <div class="config-section">
 
@@ -1582,11 +1615,32 @@
         if (mainImage) mainImage.src = imageSrc;
     }
 
-    function renderGallery(productImages) {
-        const mainImg = document.getElementById('previewImage');
-        const thumbContainer = document.getElementById('thumbnailContainer');
-        if(!mainImg || !thumbContainer) return;
+    function renderGallery(productImages, youtubeId) {
+    console.log("ID Video yang diterima:", youtubeId);
+    const mainImg = document.getElementById('previewImage');
+    const thumbContainer = document.getElementById('thumbnailContainer');
+    const videoSection = document.getElementById('youtubeSection'); 
+    // Tambahkan variabel ini untuk membungkus judul "Intip Hasil Karya"
+    const videoGalleryContainer = document.getElementById('videoGalleryContainer'); 
 
+    // 1. Tampilkan Video jika ada ID-nya
+    if (youtubeId && youtubeId.trim() !== '' && youtubeId !== 'undefined') {
+        if (videoSection) {
+            videoSection.innerHTML = `
+                <div class="video-container" style="margin-bottom:15px; border-radius:12px; overflow:hidden;">
+                    <iframe width="100%" height="200" src="https://www.youtube.com/embed/${youtubeId.trim()}" frameborder="0" allowfullscreen></iframe>
+                </div>
+            `;
+            videoSection.style.display = 'block';
+            // Munculkan container keseluruhan (termasuk judul "Intip Hasil Karya")
+            if (videoGalleryContainer) videoGalleryContainer.style.display = 'block';
+        }
+    } else {
+        // Sembunyikan bagian video jika tidak ada ID
+        if (videoSection) videoSection.style.display = 'none';
+        if (videoGalleryContainer) videoGalleryContainer.style.display = 'none';
+    }
+        
         thumbContainer.innerHTML = '';
         if (productImages && productImages.length > 0) {
             mainImg.src = productImages[0];
@@ -2107,7 +2161,8 @@
                     } else {
                         if (incBox) incBox.style.display = 'none';
                     }
-                    renderGallery(selectedProduct.images);
+                    // Panggil renderGallery dengan membawa video_youtube dari Spreadsheet
+    renderGallery(selectedProduct.images, selectedProduct.video_youtube);
                 } else {
                     window.location.href = 'index.html';
                     return;

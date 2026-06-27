@@ -661,6 +661,12 @@
         height: 100%;
         border: none;
     }
+
+    #youtubeSection {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Jarak antar video */
+}
     </style>
     <script>
         !function(f,b,e,v,n,t,s)
@@ -1615,32 +1621,84 @@
         if (mainImage) mainImage.src = imageSrc;
     }
 
-    function renderGallery(productImages, youtubeId) {
-    console.log("ID Video yang diterima:", youtubeId);
-    const mainImg = document.getElementById('previewImage');
-    const thumbContainer = document.getElementById('thumbnailContainer');
-    const videoSection = document.getElementById('youtubeSection'); 
-    // Tambahkan variabel ini untuk membungkus judul "Intip Hasil Karya"
-    const videoGalleryContainer = document.getElementById('videoGalleryContainer'); 
-
-    // 1. Tampilkan Video jika ada ID-nya
-    if (youtubeId && youtubeId.trim() !== '' && youtubeId !== 'undefined') {
-        if (videoSection) {
-            videoSection.innerHTML = `
-                <div class="video-container" style="margin-bottom:15px; border-radius:12px; overflow:hidden;">
-                    <iframe width="100%" height="200" src="https://www.youtube.com/embed/${youtubeId.trim()}" frameborder="0" allowfullscreen></iframe>
-                </div>
-            `;
-            videoSection.style.display = 'block';
-            // Munculkan container keseluruhan (termasuk judul "Intip Hasil Karya")
-            if (videoGalleryContainer) videoGalleryContainer.style.display = 'block';
-        }
-    } else {
-        // Sembunyikan bagian video jika tidak ada ID
-        if (videoSection) videoSection.style.display = 'none';
-        if (videoGalleryContainer) videoGalleryContainer.style.display = 'none';
-    }
+    // ════════════════════════════════════════
+    // FUNGSI UNTUK MENGGANTI VIDEO SAAT THUMBNAIL DIKLIK
+    // ════════════════════════════════════════
+    window.pickVideoThumb = function(element, vidId) {
+        // Ganti src video utama (tambahkan ?autoplay=1 agar langsung mutar)
+        document.getElementById('mainVideoIframe').src = `https://www.youtube.com/embed/${vidId}?autoplay=1`;
         
+        // Reset tampilan semua thumbnail jadi agak redup
+        const thumbs = document.querySelectorAll('.vid-thumb');
+        thumbs.forEach(th => {
+            th.style.borderColor = 'transparent';
+            th.style.opacity = '0.6';
+        });
+        
+        // Buat thumbnail yang dipilih jadi terang dan punya border Teal
+        element.style.borderColor = 'var(--teal)';
+        element.style.opacity = '1';
+    };
+
+    // ════════════════════════════════════════
+    // FUNGSI RENDER GALLERY (FOTO & PLAYLIST VIDEO)
+    // ════════════════════════════════════════
+    function renderGallery(productImages, youtubeId) {
+        console.log("ID Video yang diterima:", youtubeId);
+        const mainImg = document.getElementById('previewImage');
+        const thumbContainer = document.getElementById('thumbnailContainer');
+        const videoSection = document.getElementById('youtubeSection'); 
+        const videoGalleryContainer = document.getElementById('videoGalleryContainer'); 
+
+        // 1. TAMPILKAN VIDEO (GAYA PLAYLIST)
+        if (youtubeId && youtubeId.trim() !== '' && youtubeId !== 'undefined') {
+            if (videoSection) {
+                // Pecah ID berdasarkan koma dan bersihkan spasi
+                const idList = youtubeId.split(',').map(id => id.trim()).filter(id => id); 
+                
+                if (idList.length > 0) {
+                    const firstVid = idList[0]; // Video pertama yang muncul
+                    
+                    // A. Rakit Kotak Video Utama
+                    let videoHTML = `
+                        <div class="video-container" style="margin-bottom:10px; border-radius:12px; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                            <iframe id="mainVideoIframe" width="100%" height="200" src="https://www.youtube.com/embed/${firstVid}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    `;
+
+                    // B. Rakit Deretan Thumbnail (Hanya jika video lebih dari 1)
+                    if (idList.length > 1) {
+                        videoHTML += `<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none;">`; // scrollbar-width:none untuk Firefox
+                        
+                        idList.forEach((id, index) => {
+                            // Trik menarik gambar thumbnail otomatis dari YouTube
+                            const thumbUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+                            
+                            // Highlight thumbnail pertama
+                            const borderCol = index === 0 ? 'var(--teal)' : 'transparent';
+                            const opac = index === 0 ? '1' : '0.6';
+                            
+                            videoHTML += `
+                                <div class="vid-thumb" style="width:80px; height:50px; flex-shrink:0; border-radius:8px; overflow:hidden; cursor:pointer; border: 2px solid ${borderCol}; opacity: ${opac}; transition:0.3s;" onclick="pickVideoThumb(this, '${id}')">
+                                    <img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;">
+                                </div>
+                            `;
+                        });
+                        videoHTML += `</div>`;
+                    }
+
+                    videoSection.innerHTML = videoHTML;
+                    videoSection.style.display = 'block';
+                    if (videoGalleryContainer) videoGalleryContainer.style.display = 'block';
+                }
+            }
+        } else {
+            // Sembunyikan bagian video jika tidak ada data dari Sheets
+            if (videoSection) videoSection.style.display = 'none';
+            if (videoGalleryContainer) videoGalleryContainer.style.display = 'none';
+        }
+            
+        // 2. TAMPILKAN GALERI FOTO PRODUK
         thumbContainer.innerHTML = '';
         if (productImages && productImages.length > 0) {
             mainImg.src = productImages[0];
@@ -1653,6 +1711,7 @@
                 `);
             });
         } else {
+            // Gambar default jika tidak ada gambar
             mainImg.src = 'https://ik.imagekit.io/sentuhanmomen/SIBLING%203D/photo_6129446548404899457_w.jpg';
         }
     }

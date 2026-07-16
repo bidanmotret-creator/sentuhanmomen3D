@@ -1779,26 +1779,33 @@ function tanyaWA() {
     // ════════════════════════════════════════
     // FUNGSI LOGIKA TOMBOL WHATSAPP DIRECT
     // ════════════════════════════════════════
-    function handleWADirect(productId, productName) {
-        // Cek apakah data user sudah ada di memori lokal
+    // ════════════════════════════════════════
+    // FUNGSI LOGIKA TOMBOL WHATSAPP DIRECT (REVISI ANTI-GAGAL)
+    // ════════════════════════════════════════
+    window.handleWADirect = function(productId, productName) {
+        console.log("Tombol WA ditekan untuk:", productName);
+        
         const nama = localStorage.getItem('bm_lead_nama');
         const kota = localStorage.getItem('bm_lead_kota');
         const umur = localStorage.getItem('bm_lead_umur') || '';
 
         if (nama && kota) {
             // JIKA SUDAH ISI FORM: Langsung eksekusi ke WA
-            executeWADirect(productId, productName, nama, kota, umur);
+            window.executeWADirect(productId, productName, nama, kota, umur);
         } else {
             // JIKA BELUM ISI: Munculkan form cegatan
-            document.getElementById('waFastProductId').value = productId;
-            document.getElementById('waFastProductName').value = productName;
-            
             const overlay = document.getElementById('waFastFormOverlay');
-            overlay.style.display = 'flex';
+            if(overlay) {
+                document.getElementById('waFastProductId').value = productId;
+                document.getElementById('waFastProductName').value = productName;
+                overlay.style.display = 'flex';
+            } else {
+                console.error("Form Cegatan WA Tidak Ditemukan di HTML!");
+            }
         }
-    }
+    };
 
-    function submitWaFastForm() {
+    window.submitWaFastForm = function() {
         const productId = document.getElementById('waFastProductId').value;
         const productName = document.getElementById('waFastProductName').value;
         
@@ -1812,41 +1819,51 @@ function tanyaWA() {
             return;
         }
 
-        // Simpan ke memori agar next time tidak ditanya lagi
+        // Simpan ke memori
         localStorage.setItem('bm_lead_nama', nama);
         localStorage.setItem('bm_lead_wa', wa);
         localStorage.setItem('bm_lead_kota', kota);
         localStorage.setItem('bm_lead_umur', umur);
 
-        // Rekam data form ini ke Google Sheets
-        if (typeof kirimAnalitik === 'function') {
-            kirimAnalitik('Lead_Capture_WA_Fast', `[KOTA: ${kota}] [UMUR: ${umur}]`, 0, nama, wa);
-        }
+        // Tracker Analitik
+        if (typeof kirimAnalitik === 'function') kirimAnalitik('Lead_Capture_WA_Fast', `[KOTA: ${kota}] [UMUR: ${umur}]`, 0, nama, wa);
 
         // Tutup modal dan lempar ke WA
         document.getElementById('waFastFormOverlay').style.display = 'none';
-        executeWADirect(productId, productName, nama, kota, umur);
-    }
+        window.executeWADirect(productId, productName, nama, kota, umur);
+    };
 
-    function executeWADirect(productId, productName, nama, kota, umur) {
-        // Ambil data mitra yang berlaku dari sistem
-        const agen = window.WEB_CONFIG?.mitra?.[kodeMitra] || window.WEB_CONFIG?.mitra?.['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512' };
-        
-        // Format Nomor WA
-        let nomorWA = agen.wa;
-        if (nomorWA.startsWith('0')) nomorWA = '62' + nomorWA.slice(1);
+    window.executeWADirect = function(productId, productName, nama, kota, umur) {
+        try {
+            // Ambil data mitra (Gunakan agen aktif atau default pusat)
+            const activeMitra = (typeof kodeMitra !== 'undefined') ? kodeMitra : (sessionStorage.getItem('bm_kode_mitra') || 'pusat');
+            const agen = window.WEB_CONFIG?.mitra?.[activeMitra] || window.WEB_CONFIG?.mitra?.['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512' };
+            
+            // 🔥 PERBAIKAN UTAMA: Paksa nomor WA menjadi format Teks (String)
+            let nomorWA = String(agen.wa);
+            
+            // Format Nomor WA
+            if (nomorWA.startsWith('0')) {
+                nomorWA = '62' + nomorWA.slice(1);
+            }
 
-        // Template Pesan Sakti
-        let detailUmur = umur ? `(Usia anak: ${umur})` : '';
-        const pesan = `Halo CS ${agen.nama}, saya ${nama} dari ${kota} ${detailUmur}.\n\nSaya tertarik dengan paket *${productName}*. Boleh minta info detail jadwal kosong dan harganya?`;
+            // Template Pesan Sakti
+            let detailUmur = umur ? `(Usia anak: ${umur})` : '';
+            const pesan = `Halo CS ${agen.nama}, saya ${nama} dari ${kota} ${detailUmur}.\n\nSaya tertarik dengan paket *${productName}*. Boleh minta info detail jadwal kosong dan harganya?`;
 
-        // Analitik & Pixel Tracker
-        if (typeof kirimAnalitik === 'function') kirimAnalitik('Click_WA_Direct', productName, 0, nama, localStorage.getItem('bm_lead_wa') || '-');
-        if (typeof fbq === 'function') fbq('track', 'Contact', { content_name: productName });
+            // Analitik & Pixel Tracker (Aman dari error)
+            try {
+                if (typeof kirimAnalitik === 'function') kirimAnalitik('Click_WA_Direct', productName, 0, nama, localStorage.getItem('bm_lead_wa') || '-');
+                if (typeof fbq === 'function') fbq('track', 'Contact', { content_name: productName });
+            } catch(e) { console.log("Tracking terlewat, lanjut buka WA."); }
 
-        // Lempar ke WhatsApp App
-        window.open(`https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`, '_blank');
-    }
+            // Lempar ke WhatsApp App
+            window.open(`https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`, '_blank');
+        } catch (error) {
+            console.error("Gagal membuka WA:", error);
+            alert("Terjadi kendala saat membuka WhatsApp. Silakan coba lagi.");
+        }
+    };
 // ════════════════════════════════════════
     // FUNGSI PEMBUAT TOMBOL KATEGORI OTOMATIS
     // ════════════════════════════════════════

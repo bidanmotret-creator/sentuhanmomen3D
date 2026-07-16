@@ -350,6 +350,51 @@
             transition: all 0.25s;
         }
         .card-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,105,180,0.35); }
+        
+/* ══ DUAL CTA BUTTONS ══ */
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-wa-direct {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-wa-direct:hover { background: #1da851; transform: translateY(-2px); }
+        .btn-hitung {
+            background: white;
+            color: var(--teal);
+            border: 1px solid var(--teal);
+            padding: 10px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-hitung:hover { background: var(--teal-light); }
+
+        /* Khusus untuk tampilan layar HP (Shopee Style) */
+        @media (max-width: 600px) {
+            .card-actions { margin-top: auto !important; }
+            .btn-wa-direct, .btn-hitung {
+                padding: 7px !important;
+                font-size: 0.75rem !important;
+                border-radius: 6px !important;
+            }
+        }
 
         /* ══ SECTIONS ══ */
         section {
@@ -1062,6 +1107,12 @@
                 <input type="text" id="leadCity" placeholder="Contoh: Bandar Lampung" required>
             </div>
 
+            <div class="vip-form-group">
+                <label>Umur Anak</label>
+                <input type="text" id="leadUmur" placeholder="Contoh: Newborn / 6 Bulan" required>
+            </div>
+
+    
             <button class="btn-unlock" onclick="unlockKatalog()">Buka Katalog Promo Sekarang 🔓</button>
             
             <button class="btn-skip" onclick="lewatiGate()">Nanti saja, saya cuma mau lihat-lihat</button>
@@ -1416,14 +1467,15 @@
         const nama = document.getElementById('leadName').value.trim();
         const waInput = document.getElementById('leadWa').value;
         const kota = document.getElementById('leadCity').value.trim();
+        const umur = document.getElementById('leadUmur').value.trim(); // ◄▬▬ TARIK DATA UMUR
         
         let wa = waInput;
         if (wa.startsWith('08')) wa = '62' + wa.slice(1);
         if (wa.startsWith('8')) wa = '62' + wa;
 
-        // Validasi
-        if (!nama || wa.length < 10 || !kota) {
-            alert("Mohon lengkapi Nama, Nomor WA yang valid (min. 10 angka), dan Kota ya Bunda 🙏");
+        // Validasi: Wajib isi 4 kolom
+        if (!nama || wa.length < 10 || !kota || !umur) {
+            alert("Mohon lengkapi Nama, Nomor WA yang valid, Kota, dan Umur anak ya Bunda 🙏");
             return;
         }
 
@@ -1432,14 +1484,13 @@
         localStorage.setItem('bm_lead_nama', nama);
         localStorage.setItem('bm_lead_wa', wa);
         localStorage.setItem('bm_lead_kota', kota);
+        localStorage.setItem('bm_lead_umur', umur); // ◄▬▬ SIMPAN KE MEMORI HP
 
-        // 2. Kirim Data ke Google Sheets (Trik: Gunakan fungsi kirimAnalitik yang sudah ada!)
-        // Format pengiriman: Aksi, Nama Produk, Nominal, Nama Klien, WA Klien
-        // Kita manfaatkan kolom "Nama Produk" untuk menyisipkan info Kota
-        const infoProduk = `[LEAD BARU] Kota: ${kota}`;
+        // 2. Kirim Data ke Google Sheets (Sisipkan Umur di nama produk)
+        const infoProduk = `[LEAD BARU] Kota: ${kota} | Umur: ${umur}`;
         kirimAnalitik('Lead_Capture_Depan', infoProduk, 0, nama, wa);
 
-        // Lapor ke Meta Pixel (Sangat Penting buat iklan!)
+        // Lapor ke Meta Pixel
         if (typeof fbq === 'function') {
             fbq('track', 'Lead', { content_name: 'VIP Catalog Access' });
         }
@@ -1723,6 +1774,78 @@ function tanyaWA() {
         setTimeout(() => {
             window.location.href = `handcasting-custom-order.html?product=${productId}&mitra=${currentMitra}`;
         }, 200);
+    }
+
+    // ════════════════════════════════════════
+    // FUNGSI LOGIKA TOMBOL WHATSAPP DIRECT
+    // ════════════════════════════════════════
+    function handleWADirect(productId, productName) {
+        // Cek apakah data user sudah ada di memori lokal
+        const nama = localStorage.getItem('bm_lead_nama');
+        const kota = localStorage.getItem('bm_lead_kota');
+        const umur = localStorage.getItem('bm_lead_umur') || '';
+
+        if (nama && kota) {
+            // JIKA SUDAH ISI FORM: Langsung eksekusi ke WA
+            executeWADirect(productId, productName, nama, kota, umur);
+        } else {
+            // JIKA BELUM ISI: Munculkan form cegatan
+            document.getElementById('waFastProductId').value = productId;
+            document.getElementById('waFastProductName').value = productName;
+            
+            const overlay = document.getElementById('waFastFormOverlay');
+            overlay.style.display = 'flex';
+        }
+    }
+
+    function submitWaFastForm() {
+        const productId = document.getElementById('waFastProductId').value;
+        const productName = document.getElementById('waFastProductName').value;
+        
+        const nama = document.getElementById('waFastNama').value.trim();
+        const wa = document.getElementById('waFastWa').value.trim();
+        const kota = document.getElementById('waFastKota').value.trim();
+        const umur = document.getElementById('waFastUmur').value.trim();
+
+        if (!nama || wa.length < 10 || !kota || !umur) {
+            alert("Mohon lengkapi Nama, Nomor WA, Kota, dan Umur anak ya Bunda 🙏");
+            return;
+        }
+
+        // Simpan ke memori agar next time tidak ditanya lagi
+        localStorage.setItem('bm_lead_nama', nama);
+        localStorage.setItem('bm_lead_wa', wa);
+        localStorage.setItem('bm_lead_kota', kota);
+        localStorage.setItem('bm_lead_umur', umur);
+
+        // Rekam data form ini ke Google Sheets
+        if (typeof kirimAnalitik === 'function') {
+            kirimAnalitik('Lead_Capture_WA_Fast', `[KOTA: ${kota}] [UMUR: ${umur}]`, 0, nama, wa);
+        }
+
+        // Tutup modal dan lempar ke WA
+        document.getElementById('waFastFormOverlay').style.display = 'none';
+        executeWADirect(productId, productName, nama, kota, umur);
+    }
+
+    function executeWADirect(productId, productName, nama, kota, umur) {
+        // Ambil data mitra yang berlaku dari sistem
+        const agen = window.WEB_CONFIG?.mitra?.[kodeMitra] || window.WEB_CONFIG?.mitra?.['pusat'] || { nama: 'Bidan Motret', wa: '6282177272512' };
+        
+        // Format Nomor WA
+        let nomorWA = agen.wa;
+        if (nomorWA.startsWith('0')) nomorWA = '62' + nomorWA.slice(1);
+
+        // Template Pesan Sakti
+        let detailUmur = umur ? `(Usia anak: ${umur})` : '';
+        const pesan = `Halo CS ${agen.nama}, saya ${nama} dari ${kota} ${detailUmur}.\n\nSaya tertarik dengan paket *${productName}*. Boleh minta info detail jadwal kosong dan harganya?`;
+
+        // Analitik & Pixel Tracker
+        if (typeof kirimAnalitik === 'function') kirimAnalitik('Click_WA_Direct', productName, 0, nama, localStorage.getItem('bm_lead_wa') || '-');
+        if (typeof fbq === 'function') fbq('track', 'Contact', { content_name: productName });
+
+        // Lempar ke WhatsApp App
+        window.open(`https://wa.me/${nomorWA}?text=${encodeURIComponent(pesan)}`, '_blank');
     }
 // ════════════════════════════════════════
     // FUNGSI PEMBUAT TOMBOL KATEGORI OTOMATIS
@@ -2020,7 +2143,13 @@ function tanyaWA() {
                     <div class="card-price" style="min-height:45px;">
                         ${priceHtml}
                     </div>
-                    <button class="card-cta" onclick="goToOrder('${p.id}')">Pesan Sekarang →</button>
+                    <div class="card-actions">
+                        <button class="btn-wa-direct" onclick="handleWADirect('${p.id}', '${p.name}')">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            Chat WhatsApp
+                        </button>
+                        <button class="btn-hitung" onclick="goToOrder('${p.id}')">Hitung Harga Custom</button>
+                    </div>
                 </div>
             </div>
             `;
@@ -2028,5 +2157,37 @@ function tanyaWA() {
     }
     initPage();
 </script>
+
+<!-- MODAL WA FAST TRACK -->
+    <div id="waFastFormOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(26,26,46,0.9); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div class="vip-card" style="text-align:left; animation: slideUpGate 0.4s;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="color:var(--teal); margin:0; font-family:'Fredoka', sans-serif;">Konsultasi WhatsApp</h3>
+                <button onclick="document.getElementById('waFastFormOverlay').style.display='none'" style="background:none; border:none; font-size:1.8rem; cursor:pointer; color:#999;">&times;</button>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Lengkapi data berikut untuk mempercepat proses konsultasi Bunda dengan tim kami.</p>
+            
+            <input type="hidden" id="waFastProductId">
+            <input type="hidden" id="waFastProductName">
+            
+            <div class="vip-form-group">
+                <label>Nama Bunda</label>
+                <input type="text" id="waFastNama" placeholder="Contoh: Bunda Sarah">
+            </div>
+            <div class="vip-form-group">
+                <label>Nomor WhatsApp</label>
+                <input type="tel" id="waFastWa" placeholder="0812xxxxxx" oninput="formatWAGate(this)">
+            </div>
+            <div class="vip-form-group">
+                <label>Kota / Domisili</label>
+                <input type="text" id="waFastKota" placeholder="Contoh: Bandar Lampung">
+            </div>
+            <div class="vip-form-group">
+                <label>Umur Anak</label>
+                <input type="text" id="waFastUmur" placeholder="Contoh: Newborn / 6 Bulan">
+            </div>
+            <button class="btn-wa-direct" style="width:100%; padding:14px; margin-top:10px;" onclick="submitWaFastForm()">Lanjut Chat CS →</button>
+        </div>
+    </div>
 </body>
 </html>

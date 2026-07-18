@@ -879,29 +879,33 @@
         /* ════════════════════════════════════════
        ══ VIP GATE (LEAD CAPTURE) STYLES ══
        ════════════════════════════════════════ */
-    #vipGateOverlay {
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(26, 26, 46, 0.95);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(8px);
-        transition: opacity 0.4s ease;
-    }
+   #vipGateOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(26, 26, 46, 0.95);
+    z-index: 9999;
+    /* PENTING: Mengaktifkan scroll jika konten form panjang */
+    overflow-y: auto;
+    /* PENTING: Memastikan konten bisa diakses di semua ukuran layar */
+    display: block; 
+    padding: 20px 0; /* Memberi ruang napas di atas dan bawah */
+    backdrop-filter: blur(8px);
+    transition: opacity 0.4s ease;
+}
 
-    .vip-card {
-        background: white;
-        width: 90%;
-        max-width: 400px;
-        border-radius: 24px;
-        padding: 30px 25px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        text-align: center;
-        position: relative;
-        animation: slideUpGate 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
+.vip-card {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 24px;
+    padding: 30px 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+    position: relative;
+    /* Membuat kartu tetap di tengah secara horizontal */
+    margin: 0 auto;
+    /* Menghapus animasi yang terkadang memicu bug scroll di beberapa browser mobile */
+}
 
     @keyframes slideUpGate {
         from { transform: translateY(50px); opacity: 0; }

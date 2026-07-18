@@ -1071,6 +1071,33 @@
             display: none !important;
         }
     }
+
+    /* Buat kontainer utama punya kemampuan 'snap' biar enak digeser */
+.container {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+}
+
+/* Area Lead Capture kita buat 'snap' dan tidak terlalu tinggi */
+#leadCaptureSection {
+    scroll-snap-align: start;
+    height: 85vh; /* Menyisakan sedikit ruang agar user tahu ada konten di bawah */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.5s ease;
+}
+
+/* Tombol Skip yang estetik */
+.btn-skip {
+    background: transparent;
+    border: 1px solid #ccc;
+    color: #888;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
     </style>
     <script>
         !function(f,b,e,v,n,t,s)
@@ -1892,16 +1919,26 @@ function tanyaWA() {
     // FUNGSI FILTER SAAT TOMBOL DIKLIK
     // ════════════════════════════════════════
     function setFilter(btn, category) {
-        // Hapus warna aktif dari semua tombol filter (pencarian fleksibel)
+        // 1. Hapus warna aktif dari semua tombol filter
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        let filtered = window.WEB_CONFIG.products;
+        // 2. KUNCI MITRA: Dapatkan daftar produk yang HANYA BOLEH tampil untuk mitra ini
+        // Menggunakan fungsi yang sama dengan saat inisialisasi awal
+        const currentMitra = kodeMitra; 
+        const allowedProducts = window.WEB_CONFIG.products.filter(p => {
+            const target = p.target_mitra ? String(p.target_mitra).toLowerCase().trim() : '';
+            if (!target || target === '' || target === 'semua') return true;
+            return target.split(',').map(s => s.trim()).includes(currentMitra);
+        });
+
+        // 3. Filter berdasarkan kategori DARI daftar yang sudah diizinkan
+        let filtered = allowedProducts;
         if (category !== 'semua') {
-            filtered = window.WEB_CONFIG.products.filter(p => p.category === category);
+            filtered = allowedProducts.filter(p => p.category === category);
         }
         
-        // Render ulang kartu beserta parameternya (agar tau kapan munculkan sub-judul)
+        // 4. Render ulang
         renderProducts(filtered, category);
     }
 
@@ -2173,6 +2210,16 @@ function tanyaWA() {
         }).join('');
     }
     initPage();
+
+    // Tambahkan fungsi ini
+function skipCapture() {
+    // Geser layar ke bagian katalog/produk secara otomatis
+    document.getElementById('productCatalogSection').scrollIntoView({ behavior: 'smooth' });
+    
+    // Opsional: Tetap munculkan popup kecil/sticky button di bawah
+    // agar mereka bisa tetap klaim promo nanti
+    showStickyCta(); 
+}
 </script>
 
 <!-- MODAL WA FAST TRACK -->

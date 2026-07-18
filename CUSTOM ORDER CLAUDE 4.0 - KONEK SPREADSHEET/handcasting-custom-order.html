@@ -400,7 +400,7 @@
             cursor: pointer;
             margin-bottom: 20px;
             transition: all 0.2s;
-        }
+            }
         .btn-tambah:hover { background: var(--teal-light); }
 
         /* ══ JADWAL ══ */
@@ -693,17 +693,17 @@
     <div class="progress-steps">
         <div class="step active" id="stepTab0" onclick="goToStep(0)">
             <div class="step-circle" id="stepCircle0">1</div>
-            <div class="step-label">Produk</div>
+            <div class="step-label">Kustomisasi</div>
         </div>
         <div class="step-line" id="stepLine0"></div>
         <div class="step" id="stepTab1" onclick="goToStep(1)">
             <div class="step-circle" id="stepCircle1">2</div>
-            <div class="step-label">Kustomisasi</div>
+            <div class="step-label">Jadwal & Area</div>
         </div>
         <div class="step-line" id="stepLine1"></div>
         <div class="step" id="stepTab2" onclick="goToStep(2)">
             <div class="step-circle" id="stepCircle2">3</div>
-            <div class="step-label">Jadwal & Area</div>
+            <div class="step-label">Biodata</div>
         </div>
         <div class="step-line" id="stepLine2"></div>
         <div class="step" id="stepTab3" onclick="goToStep(3)">
@@ -747,34 +747,19 @@
 
     <div class="config-section">
 
-        <!-- ════════ STEPS 1: DETAIL PESANAN ════════ -->
         <div class="form-step active" id="formStep0">
             <div class="section-header">
                 <div class="section-num">1</div>
                 <div>
-                    <div class="section-title-txt">Detail Pesanan</div>
-                    <div class="section-sub" id="step1Sub">Isi data subjek / bayi</div>
+                    <div class="section-title-txt">Kustomisasi Pesanan</div>
+                    <div class="section-sub" id="step1Sub">Pilih bundling, warna, aksesoris & spesifikasi</div>
                 </div>
             </div>
 
             <div id="standardFields">
-                <!-- ▬▬ [BARU] TAMBAHKAN ID 'wadahUsiaSubjek' DI BAWAH INI ▬▬ -->
                 <div class="form-group" id="wadahUsiaSubjek">
                     <label>Usia Subjek <span class="req">*</span> <span style="font-size:0.78rem; color:var(--text-muted); font-weight:400;">(mempengaruhi bahan & harga handcasting)</span></label>
                     <select id="optUsia" onchange="hitungTotal()"></select>
-                </div>
-                <!-- ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ -->
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Nama Panggilan <span class="req">*</span></label>
-                        <input type="text" id="custBabyName" placeholder="cth: Arkan, Baby Kenzo">
-                        <div class="error-msg" id="errBabyName">⚠ Nama wajib diisi</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Lahir</label>
-                        <input type="date" id="custBabyDOB">
-                    </div>
                 </div>
             </div>
 
@@ -790,28 +775,12 @@
                 <button class="btn-tambah" type="button" onclick="tambahCetakan()">+ Tambah Cetakan / Orang</button>
             </div>
 
-            <div class="step-nav">
-                <button class="btn-next" onclick="nextStep(0)">Lanjut: Kustomisasi →</button>
-            </div>
-        </div>
-
-        <!-- ════════ STEPS 2: KUSTOMISASI TAMPILAN ════════ -->
-        <div class="form-step" id="formStep1">
-            <div class="section-header">
-                <div class="section-num">2</div>
-                <div>
-                    <div class="section-title-txt">Kustomisasi Tampilan</div>
-                    <div class="section-sub">Pilih warna, bingkai & aksesoris</div>
-                </div>
-            </div>
-
             <div class="step-section" id="photoTierSection" style="display: none; margin-bottom: 30px;">
                 <h3 style="font-size: 1rem; color: var(--teal); margin-bottom: 5px;">📸 Pilih Paket Fotografi</h3>
                 <p style="color:var(--text-muted); font-size:0.85rem;">Pilih paket layanan yang sesuai dengan kebutuhan Anda.</p>
                 <div id="photoTierGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0;"></div>
             </div>
 
-            <!-- WADAH 1: KHUSUS FOTO (CROSS SELL BUNDLING) -->
             <div id="wadahCrossSellHandcasting" style="display: none;">
                 <div class="step-section" id="crossSellSection" style="background: var(--pink-light); padding: 16px; border-radius: 12px; border: 1.5px dashed var(--pink); margin-bottom: 25px;">
                     <h3 id="crossSellTitle" style="color: var(--pink); margin-top: 0; font-size: 1rem;">✨ Spesial Promo Bundling!</h3>
@@ -831,7 +800,6 @@
                 </div>
             </div>
 
-            <!-- WADAH 2: KHUSUS HANDCASTING (AKSESORIS & BINGKAI) -->
             <div id="wadahAksesorisBingkai" style="display: none;">
                 
                 <div class="step-section" id="colorPickerSection" style="margin-bottom: 30px;">
@@ -850,7 +818,7 @@
                         <div id="colorPickerContainer" style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 15px 0;"></div>
                         
                         <div style="margin-top: 20px; padding: 15px; background: var(--teal-light); border-radius: 12px; border: 1px dashed var(--teal);">
-                            <h4 style="margin-top: 0; font-size: 0.9rem; color: var(--teal);">Preview Material Dipilih:</h4>
+                            <h4 style="margin-top: 0; font-size: 0.9rem; color: var(--teal);">Preview Custom Design Bingkai Dipilih:</h4>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 10px; text-align: center;">
                                 <div>
                                     <img id="previewCasting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3C/svg%3E" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ddd; object-fit: cover; box-shadow: var(--shadow);">
@@ -905,9 +873,7 @@
                     </div>
                 </div>
 
-            </div> <!-- AKHIR WADAH AKSESORIS -->
-
-            <div class="summary-box">
+            </div> <div class="summary-box">
                 <div class="summary-row"><span class="label" id="lblBase">Paket Dasar</span><span id="sumBase">Rp 0</span></div>
                 <div class="summary-row"><span class="label">Opsi Material & Finishing</span><span id="sumColor" style="color: var(--teal);">Rp 0</span></div>
                 <div class="summary-row"><span class="label">Aksesoris & Foto</span><span id="sumAddon">Rp 0</span></div>
@@ -916,18 +882,16 @@
             </div>
 
             <div class="step-nav">
-                <button class="btn-prev" onclick="prevStep(1)">← Kembali</button>
-                <button class="btn-next" onclick="nextStep(1)">Lanjut: Jadwal →</button>
+                <button class="btn-next" style="width: 100%;" onclick="nextStep(0)">Lanjut: Jadwal & Area →</button>
             </div>
-        </div> 
+        </div>
 
-        <!-- ════════ STEPS 3: JADWAL & KONTAK ════════ -->
-        <div class="form-step" id="formStep2">
+        <div class="form-step" id="formStep1">
             <div class="section-header">
-                <div class="section-num">3</div>
+                <div class="section-num">2</div>
                 <div>
-                    <div class="section-title-txt">Jadwal & Kontak</div>
-                    <div class="section-sub">Tentukan waktu & data pemesan</div>
+                    <div class="section-title-txt">Jadwal & Lokasi</div>
+                    <div class="section-sub">Tentukan waktu & area pengerjaan</div>
                 </div>
             </div>
 
@@ -962,6 +926,35 @@
                 <textarea id="custAddress" rows="2" placeholder="Nama jalan, RT/RW, Kelurahan, patokan..."></textarea>
             </div>
 
+            <div class="step-nav">
+                <button class="btn-prev" onclick="prevStep(1)">← Kembali</button>
+                <button class="btn-next" onclick="nextStep(1)">Lanjut: Biodata →</button>
+            </div>
+        </div> 
+
+        <div class="form-step" id="formStep2">
+            <div class="section-header">
+                <div class="section-num">3</div>
+                <div>
+                    <div class="section-title-txt">Data Diri & Subjek</div>
+                    <div class="section-sub">Informasi pemesan dan bayi/subjek</div>
+                </div>
+            </div>
+
+            <div id="standardBabyFields">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nama Panggilan Bayi/Subjek <span class="req">*</span></label>
+                        <input type="text" id="custBabyName" placeholder="cth: Arkan, Baby Kenzo">
+                        <div class="error-msg" id="errBabyName">⚠ Nama wajib diisi</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir/HPL</label>
+                        <input type="date" id="custBabyDOB">
+                    </div>
+                </div>
+            </div>
+
             <div class="form-row" style="margin-top: 6px;">
                 <div class="form-group">
                     <label>Nama Pemesan <span class="req">*</span></label>
@@ -987,7 +980,6 @@
             </div>
         </div>
 
-        <!-- ════════ STEPS 4: REVIEW & KIRIM ════════ -->
         <div class="form-step" id="formStep3">
             <div class="section-header">
                 <div class="section-num">4</div>
@@ -1007,7 +999,6 @@
                 <span>💡</span><span>Harga bersifat estimasi. Konfirmasi akhir akan dikirim via WhatsApp.</span>
             </div>
             
-            <!-- ▬▬ INJEKSI WADAH PROMO G-MAPS ▬▬ -->
             <div id="promoMapsBanner" style="display: none; background: #e8f5e9; border: 2px dashed #4caf50; padding: 15px; border-radius: 8px; margin-top: 15px; margin-bottom: 15px;">
                 <h4 style="color: #2e7d32; margin-top: 0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
                     🎁 Kejutan Khusus Hari Ini!
@@ -1030,7 +1021,6 @@
     </div>
 </div>
 
-<!-- UBAH BAGIAN INI -->
 <div style="position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 12px 20px; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; z-index: 99999; border-top: 1px solid var(--border);">
     <div>
         <div style="font-size: 0.75rem; color: var(--text-muted);">Total Estimasi</div>
@@ -1210,7 +1200,6 @@
         const wadahCrossSell = document.getElementById('wadahCrossSellHandcasting');
         const wadahAksesoris = document.getElementById('wadahAksesorisBingkai');
         
-        // ▬▬ TANGKAP WADAH USIA (LANGKAH 1) ▬▬
         const wadahUsia = document.getElementById('wadahUsiaSubjek');
 
         function getFilteredCrossSell(sourceArray) {
@@ -1221,12 +1210,9 @@
             });
         }
 
-        // Selalu siapkan pilihan warna di latar belakang
         renderColorPicker(); 
 
         if (isPhoto) {
-            // ▬▬ 1. SKENARIO KLIK PAKET FOTO / BINGKAI ▬▬
-            // Sembunyikan pilihan usia di Langkah 1 karena tidak relevan
             if (wadahUsia) wadahUsia.style.display = 'none'; 
             
             if (colorSection) colorSection.style.display = 'block'; 
@@ -1237,7 +1223,6 @@
             if (wadahCrossSell) wadahCrossSell.style.display = filteredCS.length > 0 ? 'block' : 'none';
             if (crossSellSection) crossSellSection.style.display = filteredCS.length > 0 ? 'block' : 'none';
             
-            // Serahkan kontrol hidup/mati wadah warna & aksesoris ke fungsi saklar interaktif
             cekSilangAksesoris(); 
             
             if (document.getElementById('crossSellTitle')) document.getElementById('crossSellTitle').innerHTML = '✨ Spesial Promo Bundling Handcasting!';
@@ -1301,8 +1286,6 @@
             }
 
         } else {
-            // ▬▬ 2. SKENARIO KLIK PAKET HANDCASTING ▬▬
-            // Tampilkan kembali kolom pilihan usia karena wajib untuk hitung bahan handcasting
             if (wadahUsia) wadahUsia.style.display = 'block'; 
 
             if (colorSection) colorSection.style.display = 'block'; 
@@ -1348,7 +1331,6 @@
         
         if (!dropdownBundling || !wadahAksesoris) return;
 
-        // JIKA FOTO: Kotak Aksesoris hanya muncul kalau Bundle Handcasting dipilih
         if (isPhoto) {
             if (dropdownBundling.value === "" || dropdownBundling.value === "0" || dropdownBundling.value === "Tidak, terima kasih") {
                 wadahAksesoris.style.display = 'none';
@@ -1356,7 +1338,6 @@
                 wadahAksesoris.style.display = 'block';
             }
         } 
-        // JIKA HANDCASTING: Kotak Aksesoris jangan pernah disembunyikan
         else {
             wadahAksesoris.style.display = 'block';
         }
@@ -1623,17 +1604,14 @@
     // FUNGSI UNTUK MENGGANTI VIDEO SAAT THUMBNAIL DIKLIK
     // ════════════════════════════════════════
     window.pickVideoThumb = function(element, vidId) {
-        // Ganti src video utama (tambahkan ?autoplay=1 agar langsung mutar)
         document.getElementById('mainVideoIframe').src = `https://www.youtube.com/embed/${vidId}?autoplay=1`;
         
-        // Reset tampilan semua thumbnail jadi agak redup
         const thumbs = document.querySelectorAll('.vid-thumb');
         thumbs.forEach(th => {
             th.style.borderColor = 'transparent';
             th.style.opacity = '0.6';
         });
         
-        // Buat thumbnail yang dipilih jadi terang dan punya border Teal
         element.style.borderColor = 'var(--teal)';
         element.style.opacity = '1';
     };
@@ -1651,28 +1629,22 @@
         // 1. TAMPILKAN VIDEO (GAYA PLAYLIST)
         if (youtubeId && youtubeId.trim() !== '' && youtubeId !== 'undefined') {
             if (videoSection) {
-                // Pecah ID berdasarkan koma dan bersihkan spasi
                 const idList = youtubeId.split(',').map(id => id.trim()).filter(id => id); 
                 
                 if (idList.length > 0) {
-                    const firstVid = idList[0]; // Video pertama yang muncul
+                    const firstVid = idList[0]; 
                     
-                    // A. Rakit Kotak Video Utama
                     let videoHTML = `
                         <div class="video-container" style="margin-bottom:10px; border-radius:12px; overflow:hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                             <iframe id="mainVideoIframe" width="100%" height="200" src="https://www.youtube.com/embed/${firstVid}" frameborder="0" allowfullscreen></iframe>
                         </div>
                     `;
 
-                    // B. Rakit Deretan Thumbnail (Hanya jika video lebih dari 1)
                     if (idList.length > 1) {
-                        videoHTML += `<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none;">`; // scrollbar-width:none untuk Firefox
+                        videoHTML += `<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none;">`;
                         
                         idList.forEach((id, index) => {
-                            // Trik menarik gambar thumbnail otomatis dari YouTube
                             const thumbUrl = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
-                            
-                            // Highlight thumbnail pertama
                             const borderCol = index === 0 ? 'var(--teal)' : 'transparent';
                             const opac = index === 0 ? '1' : '0.6';
                             
@@ -1691,7 +1663,6 @@
                 }
             }
         } else {
-            // Sembunyikan bagian video jika tidak ada data dari Sheets
             if (videoSection) videoSection.style.display = 'none';
             if (videoGalleryContainer) videoGalleryContainer.style.display = 'none';
         }
@@ -1709,7 +1680,6 @@
                 `);
             });
         } else {
-            // Gambar default jika tidak ada gambar
             mainImg.src = 'https://ik.imagekit.io/sentuhanmomen/SIBLING%203D/photo_6129446548404899457_w.jpg';
         }
     }
@@ -1759,28 +1729,52 @@
         input.dataset.formatted = val;
     }
 
+    /* ▬▬ PERUBAHAN: VALIDASI SESUAI URUTAN STEP BARU ▬▬ */
     function validateStep(n) {
         let ok = true;
         const isPhoto = selectedProduct?.isPhotoPackage || false;
 
-        if (n === 0 && !isCustom && !isPhoto) {
-            const name = document.getElementById('custBabyName');
-            if (name && !name.value.trim()) { 
-                name.classList.add('error'); 
-                if(document.getElementById('errBabyName')) document.getElementById('errBabyName').classList.add('show'); 
+        // Validasi Step 0 (Kustomisasi)
+        if (n === 0 && isCustom) { 
+            if (!document.querySelector('.cast-item')) { alert('Minimal 1 cetakan.'); ok = false; } 
+        }
+
+        // Validasi Step 1 (Jadwal & Lokasi)
+        if (n === 1) {
+            const jd = document.getElementById('custJadwal');
+            if (jd && !jd.value) { 
+                jd.classList.add('error'); 
+                if(document.getElementById('errJadwal')) document.getElementById('errJadwal').classList.add('show'); 
                 ok = false; 
-            } else if (name) { 
-                name.classList.remove('error'); 
-                if(document.getElementById('errBabyName')) document.getElementById('errBabyName').classList.remove('show'); 
+            } else if(jd) { 
+                jd.classList.remove('error'); 
+                if(document.getElementById('errJadwal')) document.getElementById('errJadwal').classList.remove('show'); 
             }
         }
-        if (n === 0 && isCustom) { if (!document.querySelector('.cast-item')) { alert('Minimal 1 cetakan.'); ok = false; } }
+
+        // Validasi Step 2 (Data Diri & Subjek)
         if (n === 2) {
-            const nm = document.getElementById('custName'); const wa = document.getElementById('custWa'); const jd = document.getElementById('custJadwal');
+            const name = document.getElementById('custBabyName');
+            const nm = document.getElementById('custName'); 
+            const wa = document.getElementById('custWa'); 
+
+            // Cek Nama Bayi (kecuali photo/custom)
+            if (!isCustom && !isPhoto) {
+                if (name && !name.value.trim()) { 
+                    name.classList.add('error'); 
+                    if(document.getElementById('errBabyName')) document.getElementById('errBabyName').classList.add('show'); 
+                    ok = false; 
+                } else if (name) { 
+                    name.classList.remove('error'); 
+                    if(document.getElementById('errBabyName')) document.getElementById('errBabyName').classList.remove('show'); 
+                }
+            }
+
+            // Cek Pemesan & WA
             if (nm && !nm.value.trim()) { nm.classList.add('error'); if(document.getElementById('errName')) document.getElementById('errName').classList.add('show'); ok = false; } else if(nm) { nm.classList.remove('error'); if(document.getElementById('errName')) document.getElementById('errName').classList.remove('show'); }
             if (wa && (wa.dataset.formatted || wa.value).replace(/\D/g,'').length < 10) { wa.classList.add('error'); if(document.getElementById('errWa')) document.getElementById('errWa').classList.add('show'); ok = false; } else if(wa) { wa.classList.remove('error'); if(document.getElementById('errWa')) document.getElementById('errWa').classList.remove('show'); }
-            if (jd && !jd.value) { jd.classList.add('error'); if(document.getElementById('errJadwal')) document.getElementById('errJadwal').classList.add('show'); ok = false; } else if(jd) { jd.classList.remove('error'); if(document.getElementById('errJadwal')) document.getElementById('errJadwal').classList.remove('show'); }
         }
+
         if (!ok) window.scrollTo({ top: 0, behavior: 'smooth' });
         return ok;
     }
@@ -1788,14 +1782,11 @@
     function handleFloatingNext() {
         const overlay = document.getElementById('modalOverlay');
         
-        // ▬▬ LOGIKA BARU: JIKA MODAL KONFIRMASI SEDANG TERBUKA ▬▬
-        // Ubah fungsi tombol melayang menjadi pengeksekusi WhatsApp
         if (overlay && overlay.classList.contains('show')) {
             kirimWA();
-            return; // Hentikan fungsi sampai di sini
+            return; 
         }
 
-        // ▬▬ ALUR NORMAL (BERPINDAH LANGKAH) ▬▬
         if (currentStep === 0) nextStep(0);
         else if (currentStep === 1) nextStep(1);
         else if (currentStep === 2) nextStep(2);
@@ -2056,7 +2047,6 @@
         const overlay = document.getElementById('modalOverlay');
         const num = overlay ? overlay.dataset.orderNum : '#BM-000';
         
-        // [PERBAIKAN KEBOCORAN]: Hapus 2 baris pencarian URL lama, gunakan kodeMitra!
         const mitraSekarang = kodeMitra;
         
         // 1. Susun Pesan dalam Format Teks Biasa (Plain Text)
@@ -2219,7 +2209,7 @@
                         if (incBox) incBox.style.display = 'none';
                     }
                     // Panggil renderGallery dengan membawa video_youtube dari Spreadsheet
-    renderGallery(selectedProduct.images, selectedProduct.video_youtube);
+                    renderGallery(selectedProduct.images, selectedProduct.video_youtube);
                 } else {
                     window.location.href = 'index.html';
                     return;
@@ -2271,3 +2261,5 @@
         }
     });
 </script>
+</body>
+</html>

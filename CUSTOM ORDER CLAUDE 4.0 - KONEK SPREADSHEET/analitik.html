@@ -41,6 +41,8 @@
   .filter-input:focus{border-color:var(--teal);}
   .btn-reset{background:var(--text-muted);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.85rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
   .btn-reset:hover{opacity:.8;}
+  .btn-export{background:var(--teal);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.85rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+  .btn-export:hover{opacity:.85;}
 
   /* ---- KPI cards ---- */
   .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:22px;}
@@ -102,9 +104,40 @@
   .table-scroll{max-height:520px;overflow:auto;border:1px solid var(--border);border-radius:12px;}
   .loading-state,.empty-state{text-align:center;padding:36px;color:var(--text-muted);font-style:italic;}
   .table-scroll thead th{top:0;}
+
+  .btn-print{background:var(--pink);color:#fff;border:none;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.85rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+  .btn-print:hover{opacity:.85;}
+
+  /* ══ TAMPILAN LAPORAN CETAK (hanya muncul saat Print / Save as PDF) ══ */
+  .print-header{display:none;}
+  @media print{
+    body{padding:0; background:#fff;}
+    /* Sembunyikan semua elemen interaktif yang tidak relevan untuk laporan cetak */
+    .filter-container, .table-toolbar, .mitra-lock-badge,
+    .wa-btn, .copy-btn, .last-activity,
+    th:last-child, td:last-child { display:none !important; }
+    .aksi-cell{display:none !important;}
+    .panel, .metric-card{ box-shadow:none !important; border:1px solid #ddd; break-inside: avoid; }
+    .two-col{ grid-template-columns:1fr 1fr; gap:14px; }
+    .table-scroll{ max-height:none !important; overflow:visible !important; border:none; }
+    th{ position:static !important; }
+    table{ font-size:.78rem; }
+    /* Paksa browser tetap mencetak warna latar (funnel bar, badge, dsb) */
+    *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    .print-header{
+      display:block; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--teal);
+    }
+    .print-header h1{ font-size:1.3rem; color:var(--text-dark); background:none; -webkit-text-fill-color:var(--text-dark); margin-bottom:4px; }
+    .print-header .meta{ font-size:.78rem; color:var(--text-muted); }
+  }
 </style>
 </head>
 <body>
+
+<div class="print-header" id="printHeader">
+  <h1>📈 Laporan Analitik & Follow-Up Leads — SentuhanMomen3D</h1>
+  <div class="meta" id="printMeta"></div>
+</div>
 
 <h1 class="header-title">📈 Dashboard Analitik & Follow-Up Leads</h1>
 <p class="subtitle" id="lastUpdated">Memuat data...</p>
@@ -184,6 +217,8 @@
       <option value="hot">Potensi Closing</option>
       <option value="new">Baru Masuk</option>
     </select>
+    <button class="btn-export" onclick="exportLeadsCSV()">📥 Unduh Excel/CSV</button>
+    <button class="btn-print" onclick="exportToPDF()">🖨️ Ekspor PDF (Cetak)</button>
   </div>
   <div class="table-scroll">
     <table>
@@ -210,7 +245,8 @@
 
 <script>
   // ⚠️ GANTI dengan URL deployment Apps Script kamu (yang berakhiran /exec)
-  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID_KAMU/exec';
+
   // Karena file ini di-hosting di luar Apps Script (Vercel), kode mitra dibaca
   // dari parameter URL halaman ini sendiri, lalu dikirim ke Apps Script lewat fetch().
   // Filter tetap dilakukan DI SERVER (Apps Script) -- browser cuma menerima data
@@ -233,6 +269,37 @@
     { keys:['Click_WA_Direct','Click_Tanya_WA_Katalog'], label:'Klik Chat WA' },
     { keys:['Click_WA_Berhasil'], label:'Checkout Selesai (Kirim Pesanan)' }
   ];
+
+  // ── Ekspor laporan ke PDF lewat fitur "Print / Save as PDF" bawaan browser.
+  //    Sebelum mencetak, kita isi header laporan (tanggal, filter aktif, cakupan mitra)
+  //    dan ubah title dokumen supaya nama file default saat "Save as PDF" lebih rapi.
+  function exportToPDF() {
+    var periodeText = document.getElementById('filterPeriode').options[document.getElementById('filterPeriode').selectedIndex].text;
+    var sumberText = document.getElementById('filterSumber').value || 'Semua Sumber';
+    var mitraText = MITRA_LOCK ? (MITRA_LOCK_NAMA || MITRA_LOCK) : (document.getElementById('filterMitra').value || 'Semua Mitra / Pusat');
+    var sekarang = new Date();
+    var pad = function (n) { return n.toString().padStart(2, '0'); };
+    var tanggalCetak = pad(sekarang.getDate()) + '/' + pad(sekarang.getMonth() + 1) + '/' + sekarang.getFullYear() +
+      ' ' + pad(sekarang.getHours()) + ':' + pad(sekarang.getMinutes());
+
+    var meta = document.getElementById('printMeta');
+    if (meta) {
+      meta.innerHTML =
+        'Dicetak pada: ' + tanggalCetak + ' &nbsp;|&nbsp; ' +
+        'Periode: ' + periodeText + ' &nbsp;|&nbsp; ' +
+        'Mitra: ' + mitraText + ' &nbsp;|&nbsp; ' +
+        'Sumber: ' + sumberText;
+    }
+
+    var originalTitle = document.title;
+    var namaMitraFile = MITRA_LOCK ? '-' + MITRA_LOCK : '';
+    document.title = 'Laporan-Analitik-SentuhanMomen3D' + namaMitraFile + '-' + sekarang.toISOString().slice(0, 10);
+
+    window.print();
+
+    // Kembalikan title asli setelah dialog print ditutup
+    setTimeout(function () { document.title = originalTitle; }, 1000);
+  }
 
   window.onload = function () {
     setupMitraLockUI();
@@ -584,6 +651,57 @@
         'Kami lihat ' + produkBaris2 + ' pada tanggal ' + tanggalTerakhir + '.\n\n' +
         'Apakah ada yang bisa kami bantu jelaskan lebih lanjut, Kak? Kami siap bantu dari pilihan paket sampai proses pemesanannya 🙏';
     }
+  }
+
+  // ── Export tabel leads yang SEDANG TAMPIL (mengikuti filter pencarian & status aktif)
+  //    ke file CSV, supaya mitra bisa unduh & kelola datanya sendiri di Excel/Google Sheets.
+  function exportLeadsCSV() {
+    var data = window.__leadsRendered || LEADS_ALL;
+    if (!data || !data.length) {
+      alert('Tidak ada data untuk diunduh. Coba ubah/reset filter dulu.');
+      return;
+    }
+
+    var headers = ['Waktu Masuk', 'Nama Klien', 'No WA', 'Kota', 'Usia Bayi', 'Produk Diminati', 'Mitra', 'Sumber Trafik', 'Status', 'Kontak Terakhir'];
+    var rows = [headers];
+
+    data.forEach(function (l) {
+      rows.push([
+        formatWaktu(l.waktuMasuk),
+        l.nama || '-',
+        l.wa || '-',
+        l.kota || '-',
+        l.umur || '-',
+        Array.from(l.produk).join('; ') || '-',
+        l.mitra || '-',
+        l.sumber || '-',
+        l.statusClosing ? 'Potensi Closing' : 'Baru Masuk',
+        formatWaktu(l.lastWaktu || l.waktuMasuk)
+      ]);
+    });
+
+    var csvContent = rows.map(function (row) {
+      return row.map(function (cell) {
+        var s = String(cell == null ? '' : cell);
+        if (/[",\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+        return s;
+      }).join(',');
+    }).join('\r\n');
+
+    // Tambahkan BOM UTF-8 supaya Excel membaca huruf non-ASCII (misal emoji/nama) dengan benar
+    var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var tanggal = new Date().toISOString().slice(0, 10);
+    var namaMitraFile = MITRA_LOCK ? '-' + MITRA_LOCK : '';
+    var namaFile = 'leads-sentuhanmomen3d' + namaMitraFile + '-' + tanggal + '.csv';
+
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = namaFile;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   function cleanWaNumber(wa) {

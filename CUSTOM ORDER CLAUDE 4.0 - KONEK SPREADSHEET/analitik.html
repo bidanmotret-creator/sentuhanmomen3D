@@ -210,7 +210,8 @@
 
 <script>
   // ⚠️ GANTI dengan URL deployment Apps Script kamu (yang berakhiran /exec)
-  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID_KAMU/exec';
+
   // Karena file ini di-hosting di luar Apps Script (Vercel), kode mitra dibaca
   // dari parameter URL halaman ini sendiri, lalu dikirim ke Apps Script lewat fetch().
   // Filter tetap dilakukan DI SERVER (Apps Script) -- browser cuma menerima data
@@ -223,12 +224,15 @@
   var TOTAL_ORDER_REAL = 0;
   var LEADS_ALL = [];
 
+  // Setiap stage bisa punya lebih dari 1 nama Jenis_Aksi (beberapa jalur di website
+  // memakai nama event yang berbeda untuk aksi yang sebenarnya sejenis).
   var STAGES = [
-    { key:'View_Landing_Page', label:'Kunjungan Landing Page' },
-    { key:'Lead_Capture_Depan', label:'Leads Masuk (Isi Kontak)' },
-    { key:'Click_Produk', label:'Klik Lihat Produk' },
-    { key:'View_Form_Order', label:'Isi Form Order' },
-    { key:'Click_WA_Direct', label:'Klik Chat WA' }
+    { keys:['View_Landing_Page'], label:'Kunjungan Landing Page' },
+    { keys:['Lead_Capture_Depan','Lead_Capture_WA_Fast'], label:'Leads Masuk (Isi Kontak)' },
+    { keys:['Click_Produk'], label:'Klik Lihat Produk' },
+    { keys:['View_Form_Order'], label:'Isi Form Order' },
+    { keys:['Click_WA_Direct','Click_Tanya_WA_Katalog'], label:'Klik Chat WA' },
+    { keys:['Click_WA_Berhasil'], label:'Checkout Selesai (Kirim Pesanan)' }
   ];
 
   window.onload = function () {
@@ -345,13 +349,14 @@
     onFilterChange();
   }
 
-  function countStage(rows, key) {
-    return rows.filter(r => r.Jenis_Aksi === key).length;
+  function countStage(rows, keys) {
+    var arr = Array.isArray(keys) ? keys : [keys];
+    return rows.filter(r => arr.indexOf(r.Jenis_Aksi) !== -1).length;
   }
 
   function renderMetrics(rows) {
     var traffic = countStage(rows, 'View_Landing_Page');
-    var leadsMasuk = countStage(rows, 'Lead_Capture_Depan');
+    var leadsMasuk = countStage(rows, ['Lead_Capture_Depan', 'Lead_Capture_WA_Fast']);
     var leadsHilang = countStage(rows, 'Skip_Lead_Capture');
     var uniqueLeads = buildLeadsList(rows);
     var hotLeads = uniqueLeads.filter(l => l.statusClosing).length;
@@ -377,7 +382,7 @@
   }
 
   function renderFunnel(rows) {
-    var counts = STAGES.map(s => countStage(rows, s.key));
+    var counts = STAGES.map(s => countStage(rows, s.keys));
     var maxVal = Math.max(counts[0], 1);
     var html = '';
     var worstDropIdx = -1, worstDropPct = -1;
@@ -464,9 +469,17 @@
   // Fungsi ini memisahkannya jadi { kota, umur }.
   function parseInfoLead(namaProduk) {
     if (!namaProduk) return null;
-    var m = namaProduk.toString().match(/Kota:\s*([^|]+)\|\s*Umur:\s*(.+)/i);
-    if (!m) return null;
-    return { kota: m[1].trim(), umur: m[2].trim() };
+    var text = namaProduk.toString();
+    // Menangani 2 format berbeda yang dipakai website:
+    // Format 1 (VIP Gate depan)  : "[LEAD BARU] Kota: Bakauheni | Umur: 7 hari"
+    // Format 2 (WA Fast Track)   : "[KOTA: Bakauheni] [UMUR: 7 hari]"
+    var kotaMatch = text.match(/Kota:\s*([^|\]]+)/i);
+    var umurMatch = text.match(/Umur:\s*([^\]]+)/i);
+    if (!kotaMatch && !umurMatch) return null;
+    return {
+      kota: kotaMatch ? kotaMatch[1].trim() : null,
+      umur: umurMatch ? umurMatch[1].trim() : null
+    };
   }
 
   function buildLeadsList(rows) {
@@ -493,21 +506,27 @@
 
       if (r.Nama_Klien && r.Nama_Klien !== '-') item.nama = r.Nama_Klien;
 
-      if (r.Jenis_Aksi === 'Lead_Capture_Depan') {
+      if (r.Jenis_Aksi === 'Lead_Capture_Depan' || r.Jenis_Aksi === 'Lead_Capture_WA_Fast') {
         item.waktuMasuk = dt;
         item.mitra = r.Asal_Mitra || item.mitra;
         item.sumber = r.Sumber_Trafik || item.sumber;
         var infoLead = parseInfoLead(r.Nama_Produk);
         if (infoLead) {
-          item.kota = infoLead.kota;
-          item.umur = infoLead.umur;
+          if (infoLead.kota) item.kota = infoLead.kota;
+          if (infoLead.umur) item.umur = infoLead.umur;
         }
       }
-      if ((r.Jenis_Aksi === 'Click_Produk' || r.Jenis_Aksi === 'Click_WA_Direct' || r.Jenis_Aksi === 'View_Form_Order')
+      if ((r.Jenis_Aksi === 'Click_Produk' || r.Jenis_Aksi === 'Click_WA_Direct' || r.Jenis_Aksi === 'View_Form_Order'
+        || r.Jenis_Aksi === 'Click_WA_Berhasil' || r.Jenis_Aksi === 'Lead_Tertunda')
         && r.Nama_Produk && r.Nama_Produk !== '-') {
         item.produk.add(r.Nama_Produk);
       }
-      if (r.Jenis_Aksi === 'Click_WA_Direct' || r.Jenis_Aksi === 'View_Form_Order') {
+      // Sinyal "closing" mencakup semua aksi yang menunjukkan niat serius menghubungi/checkout:
+      // klik WA di kartu produk, buka form order, isi WA di form tapi belum submit (Lead_Tertunda),
+      // klik WA di CTA bawah halaman, dan yang paling kuat: submit pesanan final (Click_WA_Berhasil).
+      if (r.Jenis_Aksi === 'Click_WA_Direct' || r.Jenis_Aksi === 'View_Form_Order'
+        || r.Jenis_Aksi === 'Click_WA_Berhasil' || r.Jenis_Aksi === 'Click_Tanya_WA_Katalog'
+        || r.Jenis_Aksi === 'Lead_Tertunda') {
         item.statusClosing = true;
       }
       if (!item.waktuMasuk) item.waktuMasuk = dt; // fallback kalau baris Lead_Capture_Depan-nya hilang

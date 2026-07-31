@@ -192,6 +192,8 @@
           <th>Waktu Masuk</th>
           <th>Nama Klien</th>
           <th>No. WA</th>
+          <th>Kota</th>
+          <th>Usia Bayi</th>
           <th>Produk Diminati</th>
           <th>Mitra</th>
           <th>Sumber</th>
@@ -200,7 +202,7 @@
         </tr>
       </thead>
       <tbody id="leadsBody">
-        <tr><td colspan="8" class="loading-state">Memuat data leads...</td></tr>
+        <tr><td colspan="10" class="loading-state">Memuat data leads...</td></tr>
       </tbody>
     </table>
   </div>
@@ -208,7 +210,7 @@
 
 <script>
   // ⚠️ GANTI dengan URL deployment Apps Script kamu (yang berakhiran /exec)
-  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY-7GjkQgzoFjJDLnhsK8kdKuEkqIrDv4QgTRhayMgydeAK5XyCdHAc1sKFBC4HD304w/exec";
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/GANTI_DENGAN_DEPLOYMENT_ID_KAMU/exec';
 
   // Karena file ini di-hosting di luar Apps Script (Vercel), kode mitra dibaca
   // dari parameter URL halaman ini sendiri, lalu dikirim ke Apps Script lewat fetch().
@@ -458,6 +460,16 @@
     renderBarList('mitraContainer', map, '');
   }
 
+  // Baris Lead_Capture_Depan menyimpan kota & umur bayi sebagai teks gabungan di
+  // kolom Nama_Produk, contoh: "[LEAD BARU] Kota: Bakauheni | Umur: 7 hari"
+  // Fungsi ini memisahkannya jadi { kota, umur }.
+  function parseInfoLead(namaProduk) {
+    if (!namaProduk) return null;
+    var m = namaProduk.toString().match(/Kota:\s*([^|]+)\|\s*Umur:\s*(.+)/i);
+    if (!m) return null;
+    return { kota: m[1].trim(), umur: m[2].trim() };
+  }
+
   function buildLeadsList(rows) {
     var map = {};
     // urutkan dulu berdasarkan waktu supaya proses "ambil terbaru" konsisten
@@ -473,6 +485,7 @@
       if (!map[wa]) {
         map[wa] = {
           wa: wa, nama: '-', mitra: r.Asal_Mitra || '-', sumber: r.Sumber_Trafik || '-',
+          kota: '-', umur: '-',
           produk: new Set(), waktuMasuk: null, lastWaktu: null, lastAksi: null, statusClosing: false
         };
       }
@@ -485,6 +498,11 @@
         item.waktuMasuk = dt;
         item.mitra = r.Asal_Mitra || item.mitra;
         item.sumber = r.Sumber_Trafik || item.sumber;
+        var infoLead = parseInfoLead(r.Nama_Produk);
+        if (infoLead) {
+          item.kota = infoLead.kota;
+          item.umur = infoLead.umur;
+        }
       }
       if ((r.Jenis_Aksi === 'Click_Produk' || r.Jenis_Aksi === 'Click_WA_Direct' || r.Jenis_Aksi === 'View_Form_Order')
         && r.Nama_Produk && r.Nama_Produk !== '-') {
@@ -520,19 +538,31 @@
     var produkText = produkList.length ? produkList.join(', ') : null;
     var tanggalTerakhir = formatWaktu(l.lastWaktu || l.waktuMasuk);
 
+    // Detail bayi (kota & usia) kalau tersedia, dibuat jadi kalimat tambahan yang lebih personal
+    var punyaKota = l.kota && l.kota !== '-';
+    var punyaUmur = l.umur && l.umur !== '-';
+    var detailBayi = '';
+    if (punyaKota && punyaUmur) {
+      detailBayi = ' untuk baby di ' + l.kota + ' (usia ' + l.umur + ')';
+    } else if (punyaKota) {
+      detailBayi = ' untuk baby di ' + l.kota;
+    } else if (punyaUmur) {
+      detailBayi = ' untuk baby usia ' + l.umur;
+    }
+
     if (l.statusClosing) {
       // Lead sudah klik WA / isi form order -> dorong ke closing
       var produkBaris = produkText
-        ? 'produk *' + produkText + '*'
-        : 'produk kami';
+        ? 'produk *' + produkText + '*' + detailBayi
+        : 'produk kami' + detailBayi;
       return 'Halo ' + namaPanggil + ', perkenalkan saya dari SentuhanMomen3D 😊\n\n' +
         'Terima kasih sudah menghubungi kami untuk ' + produkBaris + ' pada tanggal ' + tanggalTerakhir + '.\n\n' +
         'Apakah masih berkenan melanjutkan proses pemesanannya, Kak? Kami bantu sampai selesai, tinggal konfirmasi detail dan jadwalnya saja 🙏✨';
     } else {
       // Lead baru sekadar isi kontak / lihat-lihat -> soft intro
       var produkBaris2 = produkText
-        ? 'ketertarikan Kak pada produk *' + produkText + '*'
-        : 'kunjungan Kak ke katalog kami';
+        ? 'ketertarikan Kak pada produk *' + produkText + '*' + detailBayi
+        : 'kunjungan Kak ke katalog kami' + detailBayi;
       return 'Halo ' + namaPanggil + ', perkenalkan saya dari SentuhanMomen3D 😊\n\n' +
         'Kami lihat ' + produkBaris2 + ' pada tanggal ' + tanggalTerakhir + '.\n\n' +
         'Apakah ada yang bisa kami bantu jelaskan lebih lanjut, Kak? Kami siap bantu dari pilihan paket sampai proses pemesanannya 🙏';
@@ -554,12 +584,13 @@
       if (statusFilter === 'new' && l.statusClosing) return false;
       if (!search) return true;
       var produkStr = Array.from(l.produk).join(' ').toLowerCase();
-      return l.nama.toLowerCase().includes(search) || l.wa.includes(search) || produkStr.includes(search);
+      return l.nama.toLowerCase().includes(search) || l.wa.includes(search) || produkStr.includes(search)
+        || (l.kota || '').toLowerCase().includes(search);
     });
 
     var tbody = document.getElementById('leadsBody');
     if (!filtered.length) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Tidak ada leads yang cocok dengan filter.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Tidak ada leads yang cocok dengan filter.</td></tr>';
       return;
     }
 
@@ -579,6 +610,8 @@
         '<td>' + formatWaktu(l.waktuMasuk) + '</td>' +
         '<td><strong>' + l.nama + '</strong></td>' +
         '<td>' + l.wa + '</td>' +
+        '<td>' + (l.kota || '-') + '</td>' +
+        '<td>' + (l.umur || '-') + '</td>' +
         '<td>' + produkTags + '</td>' +
         '<td>' + l.mitra + '</td>' +
         '<td>' + l.sumber + '</td>' +
